@@ -41,3 +41,9 @@ example request
   ]
 }
 ```
+
+# To Start De-Queue process to dequeue from redis and send response to pistion.The response will be logged onto your console.
+```
+node sendPostRequestToPiston.js
+```
+ 
