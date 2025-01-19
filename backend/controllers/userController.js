@@ -1,4 +1,5 @@
 const supabase = require("../supabase");
+const bcrypt = require('bcrypt');
 
 const serveSigninPage = (req, res) => {
   return res.send("Signin page. Please provide email and password.");
@@ -12,17 +13,18 @@ const handleSignin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const { user, error, session } = await supabase.auth.signIn({
-      email,
-      password,
-    });
+    const { data: user, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
 
-    if (error) {
+    if (error || !user) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    res.cookie("token", session.access_token);  // store JWT in cookies
-    return res.status(200).json({ message: "Signed in successfully", token: session.access_token });
+    res.cookie("token", user.id);  // Store the user's ID or session token in a cookie
+    return res.status(200).json({ message: "Signed in successfully", token: user.id });
   } catch (error) {
     return res.status(500).json({ error: "Internal server error", message: error.message });
   }
@@ -34,54 +36,84 @@ const handleLogout = (req, res) => {
 };
 
 const handleSignup = async (req, res) => {
-  const { fullName, email, password } = req.body;
+  const { username, email, password } = req.body;
 
   try {
-    // Check if the email already exists using Supabase
-    const { data: existingUser, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("email", email)
-      .single();
-
-    if (existingUser) {
+    if (!username || !email || !password) {
       return res.status(400).json({
-        error: "Email is already in use",
-        message: "The email address you entered is already associated with an existing account.",
+        error: "Missing required fields",
+        message: "Please provide username, email, and password"
       });
     }
 
-    const { user, session, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        error: "Invalid email format",
+        message: "Please provide a valid email address"
+      });
+    }
+    const { data: existingUsers, error: checkError } = await supabase
+      .from("users")
+      .select("email")
+      .eq("email", email.toLowerCase());
 
-    if (signUpError) {
-      return res.status(500).json({ error: "Failed to sign up", message: signUpError.message });
+    if (checkError) {
+      console.error('Error checking existing user:', checkError);
+      return res.status(500).json({
+        error: "Database error",
+        message: "Error checking existing user"
+      });
     }
 
-    const { error: insertError } = await supabase.from("users").insert([
-      {
-        id: user.id,
-        full_name: fullName,
-        email,
-        role: "USER", // Default role
-      },
-    ]);
+    // Check if any users were found with this email
+    if (existingUsers && existingUsers.length > 0) {
+      return res.status(400).json({
+        error: "Email is already in use",
+        message: "The email address you entered is already associated with an existing account."
+      });
+    }
+
+    // Hash password
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Create new user object
+    const newUser = {
+      username: username,
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      role: "USER",
+      created_at: new Date().toISOString()
+    };
+
+    console.log('Attempting to insert user:', { ...newUser, password: '[REDACTED]' });
+
+    // Create user with hashed password
+    const { data: insertData, error: insertError } = await supabase
+      .from("users")
+      .insert([newUser])
+      .select('email, username, created_at');
 
     if (insertError) {
-      return res.status(500).json({ error: "Failed to create user record", message: insertError.message });
+      console.error('Error creating user:', insertError);
+      return res.status(500).json({
+        error: "Failed to create user record",
+        message: "An error occurred while creating your account"
+      });
     }
 
     return res.status(201).json({
       message: "Signup successful. You can now sign in.",
-      user: { email: user.email, fullName },
+      user: insertData[0]
     });
+
   } catch (error) {
-    console.error(error);
+    console.error('Unexpected error:', error);
     return res.status(500).json({
-      error: "Failed to create user. Try again.",
-      message: error.message,
+      error: "Failed to create user",
+      message: "An unexpected error occurred. Please try again."
     });
   }
 };
@@ -94,7 +126,12 @@ const getUserData = async (req, res) => {
   }
 
   try {
-    const { user, error } = await supabase.auth.api.getUser(token);
+    // Fetch user data using token (could be an ID or JWT, here we use the ID for simplicity)
+    const { data: user, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", token) // Assuming token contains the user ID
+      .single();
 
     if (error || !user) {
       return res.status(401).json({ error: "Invalid or expired token" });
