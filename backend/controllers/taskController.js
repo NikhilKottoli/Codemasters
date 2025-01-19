@@ -20,6 +20,23 @@ const addTask = async (req, res) => {
   }
 };
 
+const runTask = async (req, res) => {
+  try {
+    const data = req.body;
+
+    if (!data.language || !data.source) {
+      return res.status(400).json({ error: 'Missing required fields: language or source' });
+    }
+
+    // Also push task to taskQueue for processing
+    await client.lPush('taskQueue', JSON.stringify(data));
+
+    res.status(200).json({ message: 'Task added successfully' });
+  } catch (err) {
+    console.error('Error adding task:', err.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
 
 // GET /tasks/:id - Get task result by ID from Redis
 const getTaskResultById = async (req, res) => {
