@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { createClient } = require('redis');
+const logger = require('./logger');
 
 const client = createClient({ url: 'redis://localhost:6379' });
 client.connect().then(() => {
