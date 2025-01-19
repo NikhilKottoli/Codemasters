@@ -6,29 +6,38 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
 
 export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
 
-  async function onSubmit(event: React.FormEvent) {
+  // Define the type for form submission
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
 
     try {
       const formData = new FormData(event.target as HTMLFormElement);
-      const response = await fetch('/user/signin', {
+      const email = formData.get('email') as string;
+      const password = formData.get('password') as string;
+
+      const response = await fetch('http://localhost:3000/user/signin', {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Sign in failed');
+        throw new Error(data.error || 'Sign in failed');
       }
 
+      // If successful, optionally handle the token here (e.g., cookies or localStorage)
       toast.success('Signed in successfully');
-    } catch (error) {
-      toast.error('Failed to sign in');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to sign in');
     } finally {
       setIsLoading(false);
     }
@@ -36,7 +45,7 @@ export default function SignIn() {
 
   return (
     <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-      <motion.div 
+      <motion.div
         className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r"
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
@@ -56,7 +65,7 @@ export default function SignIn() {
           </blockquote>
         </div>
       </motion.div>
-      <motion.div 
+      <motion.div
         className="lg:p-8"
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
@@ -95,7 +104,7 @@ export default function SignIn() {
                   required
                 />
               </div>
-              <Button disabled={isLoading}>
+              <Button type="submit" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Sign In
               </Button>
