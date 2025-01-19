@@ -29,14 +29,14 @@ class TaskProcessor {
   }
 
   async storeResult(taskId, result) {
-    await this.redis.setex(`result:${taskId}`, 3600, JSON.stringify(result));
-    
+    await this.redis.setex(`run:${taskId}`, 3600, JSON.stringify(result));
     await this.redis.lpush('processed_results', taskId);
   }
 
   async processTask(taskData) {
+    let task;
     try {
-      const task = JSON.parse(taskData);
+      task = JSON.parse(taskData);
       if (!task.language || !task.source || !task.id) {
         throw new Error('Invalid task format - missing required fields');
       }
@@ -44,7 +44,6 @@ class TaskProcessor {
       console.log(`Processing task ${task.id}...`);
       const result = await this.executeCode(task);
       
-      // Store execution result in Redis
       await this.storeResult(task.id, {
         taskId: task.id,
         status: 'completed',
@@ -53,12 +52,10 @@ class TaskProcessor {
       });
 
       console.log(`Task ${task.id} processed successfully`);
-      await this.redis.lrem('submissions', 0, taskData);
       return result;
     } catch (error) {
       console.error(`Task processing failed: ${error.message}`);
       
-      // Store error result
       if (task?.id) {
         await this.storeResult(task.id, {
           taskId: task.id,
@@ -67,8 +64,16 @@ class TaskProcessor {
           completedAt: new Date().toISOString()
         });
       }
-      
-      await this.redis.lrem('submissions', 0, taskData);
+    }
+  }
+
+  async processNextSubmission() {
+    const submission = await this.redis.rpop('submissions');
+    if (submission) {
+      console.log('Processing submission from submissions queue');
+      await this.processTask(submission);
+      // Add delay for rate limiting
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
 
@@ -76,19 +81,16 @@ class TaskProcessor {
     while (this.isRunning) {
       try {
         console.log('Waiting for tasks...');
-        const result = await this.redis.brpop('taskQueue', 0);
+        const result = await this.redis.brpop('taskQueue', 1);
         
         if (result) {
+          // Process taskQueue item with priority
           const [queue, taskData] = result;
           console.log('Task received from queue:', queue);
-          
-          const tasks = await this.redis.lrange('submissions', 0, -1);
-          console.log(`Processing ${tasks.length} submissions...`);
-          
-          for (const task of tasks) {
-            if (!this.isRunning) break;
-            await this.processTask(task);
-          }
+          await this.processTask(taskData);
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } else {
+          await this.processNextSubmission();
         }
       } catch (error) {
         console.error('Processing error:', error.message);
