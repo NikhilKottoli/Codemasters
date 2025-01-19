@@ -4,6 +4,8 @@ const cors = require('cors');
 const taskRoutes = require('./routes/taskRoutes');
 const userRoutes = require('./routes/userRoutes');
 const supabase = require('./supabase')
+const { client } = require('./redisClient');
+
 const app = express();
 const port = process.env.PORT || 3000;
 
