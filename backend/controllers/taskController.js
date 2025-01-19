@@ -5,7 +5,7 @@ const addTask = async (req, res) => {
   try {
     const data = req.body;
 
-    if (!data.language || !data.source) {
+    if (!data.language) {
       return res.status(400).json({ error: 'Missing required fields: language or source' });
     }
 
