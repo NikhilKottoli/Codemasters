@@ -21,6 +21,10 @@ const handleSignin = async (req, res) => {
 
     if (error || !user) {
       return res.status(401).json({ error: "Invalid email or password" });
+    } 
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
     res.cookie("token", user.id);  // Store the user's ID or session token in a cookie
