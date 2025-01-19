@@ -1,131 +1,113 @@
+const Redis = require('ioredis');
 const axios = require('axios');
-const { createClient } = require('redis');
-const logger = require('./logger');
 
-const client = createClient({ url: 'redis://localhost:6379' });
-client.connect().then(() => {
-  console.log('Connected to Redis');
-}).catch((err) => {
-  console.error('Error connecting to Redis:', err.message);
-});
-
-const MAX_RETRIES = 5;
-
-const validateTask = (task) => {
-  const requiredFields = ['language', 'source'];
-  for (const field of requiredFields) {
-    if (!task[field]) {
-      throw new Error(`Missing required field: ${field}`);
-    }
+class TaskProcessor {
+  constructor(redisUrl = 'redis://localhost:6379') {
+    this.redis = new Redis(redisUrl);
+    this.isRunning = true;
+    this.setupShutdown();
   }
-};
 
-const sendPostRequestToPiston = async (task, taskIndex, attempt = 1) => {
-  try {
-    validateTask(task);
+  async executeCode(task) {
+    const fileExtension = {
+      python: 'py',
+      javascript: 'js',
+      java: 'java'
+    }[task.language] || 'txt';
 
-    // Transform the task into the correct Piston API format
-    const pistonPayload = {
+    const response = await axios.post('https://emkc.org/api/v2/piston/execute', {
       language: task.language,
       version: task.version || '*',
       files: [{
-        name: `main.${getFileExtension(task.language)}`,
+        name: `main.${fileExtension}`,
         content: task.source
       }],
       stdin: task.stdin || ''
-    };
-
-    const response = await axios.post('https://emkc.org/api/v2/piston/execute', pistonPayload, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
     });
 
-    console.log('Response from Piston:', response.data);
-    
-    if (response.status === 200) {
-      await client.lRem('submissions', 0, JSON.stringify(task));
-      console.log(`Task at index ${taskIndex} removed from Redis.`);
-    }
-
     return response.data;
-  } catch (error) {
-    if (error.response && error.response.status === 429 && attempt <= MAX_RETRIES) {
-      const backoffTime = Math.pow(2, attempt) * 1000;
-      console.log(`Rate limit exceeded, retrying in ${backoffTime / 1000} seconds...`);
-      await delay(backoffTime);
-      return sendPostRequestToPiston(task, taskIndex, attempt + 1);
-    } else {
-      console.error('Error details:', {
-        message: error.message,
-        response: error.response?.data,
-        task: task
+  }
+
+  async storeResult(taskId, result) {
+    await this.redis.setex(`result:${taskId}`, 3600, JSON.stringify(result));
+    
+    await this.redis.lpush('processed_results', taskId);
+  }
+
+  async processTask(taskData) {
+    try {
+      const task = JSON.parse(taskData);
+      if (!task.language || !task.source || !task.id) {
+        throw new Error('Invalid task format - missing required fields');
+      }
+
+      console.log(`Processing task ${task.id}...`);
+      const result = await this.executeCode(task);
+      
+      // Store execution result in Redis
+      await this.storeResult(task.id, {
+        taskId: task.id,
+        status: 'completed',
+        result: result,
+        completedAt: new Date().toISOString()
       });
-      throw error;
+
+      console.log(`Task ${task.id} processed successfully`);
+      await this.redis.lrem('submissions', 0, taskData);
+      return result;
+    } catch (error) {
+      console.error(`Task processing failed: ${error.message}`);
+      
+      // Store error result
+      if (task?.id) {
+        await this.storeResult(task.id, {
+          taskId: task.id,
+          status: 'failed',
+          error: error.message,
+          completedAt: new Date().toISOString()
+        });
+      }
+      
+      await this.redis.lrem('submissions', 0, taskData);
     }
   }
-};
 
-// Helper function to get appropriate file extension
-const getFileExtension = (language) => {
-  const extensions = {
-    'python': 'py',
-    'javascript': 'js',
-    'java': 'java',
-    'c++': 'cpp',
-    'c': 'c',
-    'ruby': 'rb',
-    'go': 'go',
-    'rust': 'rs',
-    'php': 'php'
-  };
-  return extensions[language] || 'txt';
-};
-
-const processTasksFromRedis = async () => {
-  try {
-    const tasks = await client.lRange('submissions', 0, -1);
-    console.log(`Processing ${tasks.length} tasks from Redis`);
-
-    for (let i = 0; i < tasks.length; i++) {
+  async start() {
+    while (this.isRunning) {
       try {
-        const taskString = tasks[i];
-        const task = JSON.parse(taskString);
-        console.log(`Processing task ${i + 1}/${tasks.length}:`, task);
+        console.log('Waiting for tasks...');
+        const result = await this.redis.brpop('taskQueue', 0);
         
-        await sendPostRequestToPiston(task, i);
-        await delay(1000); // Rate limiting delay
-      } catch (parseError) {
-        console.error(`Error processing task at index ${i}:`, parseError.message);
-        await client.lRem('submissions', 0, tasks[i]);
+        if (result) {
+          const [queue, taskData] = result;
+          console.log('Task received from queue:', queue);
+          
+          const tasks = await this.redis.lrange('submissions', 0, -1);
+          console.log(`Processing ${tasks.length} submissions...`);
+          
+          for (const task of tasks) {
+            if (!this.isRunning) break;
+            await this.processTask(task);
+          }
+        }
+      } catch (error) {
+        console.error('Processing error:', error.message);
       }
     }
-  } catch (error) {
-    console.error('Error processing tasks from Redis:', error.message);
   }
-};
 
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  setupShutdown() {
+    process.on('SIGINT', async () => {
+      console.log('Shutting down gracefully...');
+      this.isRunning = false;
+      await this.redis.quit();
+      process.exit(0);
+    });
+  }
+}
 
-// Graceful shutdown handling
-process.on('SIGINT', async () => {
-  console.log('Shutting down...');
-  await client.quit();
-  process.exit(0);
+const processor = new TaskProcessor();
+processor.start().catch(error => {
+  console.error('Fatal error:', error.message);
+  process.exit(1);
 });
-
-// Start processing with error handling
-const startProcessing = async () => {
-  try {
-    while (true) {
-      await processTasksFromRedis();
-      await delay(2000);
-    }
-  } catch (error) {
-    console.error('Fatal error in processing loop:', error);
-    await client.quit();
-    process.exit(1);
-  }
-};
-
-startProcessing();
