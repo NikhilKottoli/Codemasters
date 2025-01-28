@@ -1,48 +1,50 @@
-const { client } = require('../redisClient');  // Import Redis client
+const { client } = require('../redisClient');
+const supabase = require("../supabase");
 
-// POST /test - Add a new task to Redis
 const Submit = async (req, res) => {
   console.log('Received submission:', req.body);
   try {
-    const { language } = req.body;
+    const { language, userId, code, action } = req.body;
 
     // Validate required field
-    if (!language) {
-      return res.status(400).json({ error: 'Missing required field: language' });
+    if (!language || !userId || !code || !action) {
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Push task to Redis queues
+    // Determine the queue based on the action
+    let queue = action === 'run' ? 'runQueue' : 'submitQueue';
+
+    // If it's a submitQueue, store the submission in Supabase
+    if (queue === 'submitQueue') {
+      const { data, error } = await supabase
+        .from('submission')
+        .insert([
+          {
+            user_id: userId,
+            code: code,
+            language: language,
+          },
+        ]);
+
+      if (error) {
+        console.error('Error inserting into Supabase:', error);
+        return res.status(500).json({ error: 'Failed to insert submission into Supabase' });
+      }
+    }
+
+    // Add task to the appropriate Redis queue
     await Promise.all([
-      client.lPush('submissions', JSON.stringify(task))
+      client.lPush(queue, JSON.stringify(req.body)),
     ]);
 
     res.status(200).json({ 
       message: 'Submission added successfully', 
-      taskId: task.id 
     });
   } catch (err) {
     console.error('Error adding task:', err);
     res.status(500).json({ error: 'Failed to add task' });
   }
 };
-
-const runTask = async (req, res) => {
-  try {
-    const data = req.body;
-    console.log('Received task:', data);
-    if (!data.language ||!data.code || !data.taskId) {
-      return res.status(400).json({ error: 'Missing required fields: language or source' });
-    }
-
-    // Also push task to taskQueue for processing
-    await client.lPush('taskQueue', JSON.stringify(data));
-
-    res.status(200).json({ message: 'Task added successfully' });
-  } catch (err) {
-    console.error('Error adding task:', err.message);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-}
 
 // GET /tasks/:id - Get task result by ID from Redis
 const getTaskResultById = async (req, res) => {
@@ -64,4 +66,4 @@ const getTaskResultById = async (req, res) => {
 };
 
 
-module.exports = { Submit, getTaskResultById, runTask };
+module.exports = { Submit, getTaskResultById };
