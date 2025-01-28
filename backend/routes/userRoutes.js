@@ -17,6 +17,6 @@ router.get('/signup', serveSignupPage);
 router.post('/signin', handleSignin);
 router.post('/signup', handleSignup);
 router.get('/logout', handleLogout);
-router.get('/userData', getUserData);
+router.get('/userData/:id', getUserData);
 
 module.exports = router;  // Export the router to be used elsewhere

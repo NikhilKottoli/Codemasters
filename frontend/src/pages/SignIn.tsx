@@ -29,13 +29,15 @@ export default function SignIn() {
       });
 
       const data = await response.json();
-
+      localStorage.setItem('token', data.token);
+      
       if (!response.ok) {
         throw new Error(data.error || 'Sign in failed');
       }
 
       // If successful, optionally handle the token here (e.g., cookies or localStorage)
       toast.success('Signed in successfully');
+      console.log('Token:', data.token);
     } catch (error: any) {
       toast.error(error.message || 'Failed to sign in');
     } finally {

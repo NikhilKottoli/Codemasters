@@ -1,11 +1,10 @@
 const express = require('express');
-const { Submit, getTaskResultById, runTask } = require('../controllers/taskController');
+const { Submit, getTaskResultById } = require('../controllers/taskController');
 
 const router = express.Router();
 
 // Define routes
-router.post('/submit', Submit);
+router.post('/', Submit);
 router.get('/:id', getTaskResultById);
-router.post('/run', runTask);
 
 module.exports = router;

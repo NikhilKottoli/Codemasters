@@ -5,12 +5,14 @@ const taskRoutes = require('./routes/taskRoutes');
 const userRoutes = require('./routes/userRoutes');
 const supabase = require('./supabase')
 const { client } = require('./redisClient');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors({ origin: '*' }));
 app.use(express.json());
+app.use(cookieParser());
 
 app.use('/task', taskRoutes);
 app.use('/user',userRoutes);

@@ -27,7 +27,12 @@ const handleSignin = async (req, res) => {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    res.cookie("token", user.id);  // Store the user's ID or session token in a cookie
+    res.cookie("token", user.id, {
+      httpOnly: true,
+      secure: false,
+      maxAge: 3600000,
+      sameSite: "Strict",
+    });
     return res.status(200).json({ message: "Signed in successfully", token: user.id });
   } catch (error) {
     return res.status(500).json({ error: "Internal server error", message: error.message });
@@ -123,18 +128,13 @@ const handleSignup = async (req, res) => {
 };
 
 const getUserData = async (req, res) => {
-  const token = req.cookies.token;
-
-  if (!token) {
-    return res.status(401).json({ error: "Unauthorized, no token provided" });
-  }
+  const {id} = req.params;
 
   try {
-    // Fetch user data using token (could be an ID or JWT, here we use the ID for simplicity)
     const { data: user, error } = await supabase
       .from("users")
-      .select("*")
-      .eq("id", token) // Assuming token contains the user ID
+      .select("email, username, role")
+      .eq("id", id)
       .single();
 
     if (error || !user) {
