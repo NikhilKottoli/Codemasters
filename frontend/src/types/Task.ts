@@ -4,6 +4,7 @@ export interface Task {
   taskId: string;
   code: string;
   language: string;
+  questionId: string|undefined;
 }
 
 export const createTask = (taskData: Omit<Task, 'taskId'>): Task => {

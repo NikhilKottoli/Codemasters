@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const taskRoutes = require('./routes/taskRoutes');
 const userRoutes = require('./routes/userRoutes');
+const questionRoutes = require('./routes/questionRoutes');
 const supabase = require('./supabase')
 const { client } = require('./redisClient');
 const cookieParser = require('cookie-parser');
@@ -16,7 +17,7 @@ app.use(cookieParser());
 
 app.use('/task', taskRoutes);
 app.use('/user',userRoutes);
-
+app.use('/question',questionRoutes)
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
