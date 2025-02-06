@@ -6,10 +6,12 @@ import { Toaster } from '@/components/ui/sonner';
 import Questions from './pages/Questions';
 import TaskFetcher from './pages/TaskFetcher';
 import AddQuestionForm from './pages/AddQuestionForm';
+import { QuestionProvider } from './contexts/questionContext/questionContext';
 
 function App() {
   return (
-    <Router>
+    <QuestionProvider>
+        <Router>
       <Routes>
         <Route path="/" element={<SignIn />} />
         <Route path="/user/signup" element={<SignUp />} />
@@ -20,6 +22,7 @@ function App() {
       </Routes>
       <Toaster />
     </Router>
+    </QuestionProvider>
   );
 }
 

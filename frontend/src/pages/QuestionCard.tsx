@@ -1,51 +1,36 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Timer, BarChart2, Brain } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { FullQuestionProps,getDifficultyColor } from '@/types/question';
 
-interface QuestionCardProps {
-  title: string;
-  description: string;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
-  category: string;
-  timeLimit: string;
-  acceptance: string;
-  exampleInput: string;
-  expectedOutput: string;
-  constraint_data: string;
-}
 
-const getDifficultyColor = (difficulty: 'Easy' | 'Medium' | 'Hard') => {
-  switch (difficulty) {
-    case 'Easy':
-      return 'bg-green-500';
-    case 'Medium':
-      return 'bg-yellow-500';
-    case 'Hard':
-      return 'bg-red-500';
-    default:
-      return 'bg-gray-500';
-  }
-};
 
-const QuestionCard: React.FC<QuestionCardProps> = ({
+const QuestionCard: React.FC<FullQuestionProps> = ({
   title,
   description,
   difficulty,
   category,
   timeLimit,
   acceptance,
-  exampleInput,
-  expectedOutput,
+  example_input,
+  expected_output,
   constraint_data,
 }) => {
-  return (
-    <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow w-full max-w-md">
-      <h2 className="text-xl font-bold mb-3">{title}</h2>
-      <pre className="text-gray-600 mb-4 text-sm overflow-y-auto">{description}</pre>
+   
+  const [input, setInput] = React.useState(example_input);
+  const [output, setOutput] = React.useState(expected_output);
 
-      <div className="flex flex-wrap items-center gap-4 mb-4">
-        <Badge className={`${getDifficultyColor(difficulty)} text-white text-sm px-3 py-1`}>{difficulty}</Badge>
-        <div className="text-xs text-gray-500 space-y-1">
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow  min-h-[90%] w-full max-w-md">
+      <h2 className="text-xl font-bold mb-3">{title}</h2>
+      <div className="text-gray-600 mb-6 h-auto overflow-visible break-words">
+          {description}
+        </div>
+
+      <div className="flex flex-col gap-4 mb-4">
+        <Badge className={`${getDifficultyColor(difficulty)} text-white text-sm min-w-auto max-w-[30%] px-3 py-1`}>{difficulty}</Badge>
+        <div className="text-xs flex flex-col text-gray-500 space-y-1">
           <div className="flex items-center gap-1">
             <Timer className="w-4 h-4" />
             <span>{timeLimit}</span>
@@ -61,22 +46,33 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
         </div>
       </div>
 
-      <div className="mb-4">
-        <h3 className="font-semibold text-sm">Example:</h3>
-        <div className="bg-gray-100 p-2 rounded-md text-xs whitespace-pre-wrap">
-          <strong>Input:</strong>
-          <pre className="overflow-x-auto">{exampleInput}</pre>
-          <strong>Output:</strong>
-          <pre className="overflow-x-auto">{expectedOutput}</pre>
-        </div>
-      </div>
 
-      <div>
-        <h3 className="font-semibold text-sm">Constraints:</h3>
+      <div className='mb-4'>
+        <h3 className="font-semibold text-sm mb-4">Constraints:</h3>
         <div className="bg-gray-100 p-2 rounded-md text-xs overflow-y-auto max-h-32 whitespace-pre-wrap">
           {constraint_data}
         </div>
       </div>
+
+      <div className="space-y-2">
+      <h3 className="font-semibold text-sm">Example:</h3>
+      <div className="bg-gray-100 p-2 rounded-md text-xs">
+        <h3 className='py-4'>Input:</h3>
+        <Textarea
+          className="w-full mt-1"
+          value={input}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
+        />
+        <h3 className='py-4'>Output:</h3>
+        <Textarea
+          className="w-full mt-1"
+          value={output}
+          onChange={(e:React.ChangeEvent<HTMLTextAreaElement>) => setOutput(e.target.value)}
+        />
+      </div>
+    </div>
+
+     
     </div>
   );
 };

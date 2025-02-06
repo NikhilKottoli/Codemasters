@@ -4,28 +4,9 @@ import axios from 'axios';
 import Editor from './Editor';
 import ActionBar from './ActionBar';
 import QuestionCard from './QuestionCard';
-import { Task, createTask } from '../types/Task';
-
-interface TaskResult {
-  taskId: string;
-  questionId: string;
-  status: 'pending' | 'completed' | 'failed';
-  output?: string;
-  completedAt?: string;
-  userId: string;
-}
-
-interface QuestionCardProps {
-  title: string;
-  description: string;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
-  category: string;
-  timeLimit: string;
-  acceptance: string;
-  example_input: string;
-  expected_output: string;
-  constraint_data: string;
-}
+import { TaskResult, createTask } from '../types/Task';
+import { FullQuestionProps } from '@/types/question';
+import { useQuestion,useSetQuestion } from '@/contexts/questionContext/useQuestion';
 
 const TaskFetcher = () => {
   const { questionId } = useParams();
@@ -38,7 +19,8 @@ const TaskFetcher = () => {
   const userid = localStorage.getItem('token');
 
   // Fetch question details from the API using questionId
-  const [question, setQuestion] = useState<QuestionCardProps | null>(null);
+  const question= useQuestion();
+  const setQuestion = useSetQuestion();
 
   useEffect(() => {
     const fetchQuestion = async () => {
@@ -100,6 +82,25 @@ const TaskFetcher = () => {
         questionId
       });
 
+      if(actionType === 'run'){
+        const response = await axios.post(
+          'http://localhost:3000/task',
+          {
+            ...task,
+            action: actionType,
+            userId: userid,
+            input: question.example_input,
+            output: question.expected_output
+
+          },
+          { headers: { 'Content-Type': 'application/json' } }
+        );
+        setIsPolling(true);
+        pollTaskResult(task.taskId);
+        return;
+      }
+      else if(actionType === 'submit'){
+
       const response = await axios.post(
         'http://localhost:3000/task',
         {
@@ -112,7 +113,8 @@ const TaskFetcher = () => {
 
       setIsPolling(true);
       pollTaskResult(task.taskId);
-    } catch (error) {
+      return;
+    }} catch (error) {
       setError(error instanceof Error ? error.message : `Failed to ${actionType} code`);
       setIsLoading(false);
     }
@@ -120,10 +122,10 @@ const TaskFetcher = () => {
 
   const normalizeString = (str:string) => {
     return str
-      .trim()  // Removes leading and trailing spaces
-      .replace(/\s+/g, ' ')  // Replaces multiple spaces with a single space
-      .replace(/\n+/g, '\n')  // Normalize multiple newlines to a single newline
-      .replace(/\n/g, ' ')  // Optional: if you want to treat all newlines as space
+      .trim() 
+      .replace(/\s+/g, ' ') 
+      .replace(/\n+/g, '\n')
+      .replace(/\n/g, ' ')  
   };
   
 
@@ -146,8 +148,8 @@ const TaskFetcher = () => {
               category={question.category}
               timeLimit={question.timeLimit}
               acceptance={question.acceptance}
-              exampleInput={question.example_input}
-              expectedOutput={question.expected_output}
+              example_input={question.example_input}
+              expected_output={question.expected_output}
               constraint_data={question.constraint_data}
             />
           </div>

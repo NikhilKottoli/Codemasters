@@ -1,21 +1,43 @@
 const { client } = require('../redisClient');
 const supabase = require("../supabase");
 
-const Submit = async (req, res) => {
+const executeTask = async (req, res) => {
   console.log('Received submission:', req.body);
   try {
-    const { language, userId, code, action } = req.body;
-
-    // Validate required field
+   
     if (!language || !userId || !code || !action) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
+  if(req.body.action === 'run') {
+    const { language, userId, code, action,stdin,output } = req.body;
+
+    // Validate required field
+    if(!input||!output){ {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    let queue ='runQueue';
+
+    await Promise.all([
+      client.lPush(queue, JSON.stringify(req.body)),
+    ]);
+
+    res.status(200).json({ 
+      message: 'Submission added successfully', 
+    });
+  }} else {
+
+  
+    const { language, userId, code, action } = req.body;
+
+    // Validate required field
+   
+
     // Determine the queue based on the action
-    let queue = action === 'run' ? 'runQueue' : 'submitQueue';
+    let queue = 'submitQueue';
 
     // If it's a submitQueue, store the submission in Supabase
-    if (queue === 'submitQueue') {
+    
       const { data, error } = await supabase
         .from('submission')
         .insert([
@@ -30,7 +52,7 @@ const Submit = async (req, res) => {
         console.error('Error inserting into Supabase:', error);
         return res.status(500).json({ error: 'Failed to insert submission into Supabase' });
       }
-    }
+    
 
     // Add task to the appropriate Redis queue
     await Promise.all([
@@ -40,6 +62,7 @@ const Submit = async (req, res) => {
     res.status(200).json({ 
       message: 'Submission added successfully', 
     });
+  }
   } catch (err) {
     console.error('Error adding task:', err);
     res.status(500).json({ error: 'Failed to add task' });

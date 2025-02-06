@@ -3,29 +3,13 @@ import axios from "axios";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
+import { QuestionCardProps,getDifficultyColor } from "@/types/question";
 
-interface Question {
-  id: string;
-  title: string;
-  difficulty: "Easy" | "Medium" | "Hard";
-  category: string;
-}
 
-const getDifficultyColor = (difficulty: Question["difficulty"]) => {
-  switch (difficulty) {
-    case "Easy":
-      return "bg-green-500";
-    case "Medium":
-      return "bg-yellow-500";
-    case "Hard":
-      return "bg-red-500";
-    default:
-      return "bg-gray-500";
-  }
-};
+
 
 const QuestionsList = () => {
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<QuestionCardProps[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
