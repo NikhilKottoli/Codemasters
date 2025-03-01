@@ -1,5 +1,5 @@
 const express = require('express');
-const { Submit, getTaskResultById } = require('../controllers/taskController');
+const { executeTask, getTaskResultById } = require('../controllers/taskController');
 
 const router = express.Router();
 

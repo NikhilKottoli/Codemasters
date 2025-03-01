@@ -5,9 +5,12 @@ export interface FullQuestionProps {
     category: string;
     timeLimit: string;
     acceptance: string;
-    example_input: string;
-    expected_output: string;
+    example_input: Record<string, string>;
+    expected_output: Record<string, string>;
+    selected_input: string|null;
+    selected_output: string|null;
     constraint_data: string;
+    visible_test_cases: string;
   }
 
 

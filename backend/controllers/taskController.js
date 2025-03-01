@@ -3,9 +3,11 @@ const supabase = require("../supabase");
 
 const executeTask = async (req, res) => {
   console.log('Received submission:', req.body);
+
+  const { language, userId, code, action, stdin } = req.body;
   try {
    
-    if (!language || !userId || !code || !action) {
+    if (!language || !userId || !code || !action || !stdin) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -13,7 +15,7 @@ const executeTask = async (req, res) => {
     const { language, userId, code, action,stdin,output } = req.body;
 
     // Validate required field
-    if(!input||!output){ {
+    if(!stdin||!output){ 
       return res.status(400).json({ error: 'Missing required fields' });
     }
     let queue ='runQueue';
@@ -25,7 +27,7 @@ const executeTask = async (req, res) => {
     res.status(200).json({ 
       message: 'Submission added successfully', 
     });
-  }} else {
+  } else {
 
   
     const { language, userId, code, action } = req.body;
@@ -89,4 +91,4 @@ const getTaskResultById = async (req, res) => {
 };
 
 
-module.exports = { Submit, getTaskResultById };
+module.exports = { executeTask, getTaskResultById };

@@ -1,3 +1,4 @@
+const { format } = require('path');
 const supabase = require('../supabase'); // Import the Supabase client
 
 // Get all questions title and some details
@@ -25,6 +26,7 @@ const getQuestionById = async (req, res) => {
 
   try {
     // Fetching a specific question by ID
+    console.log(questionId);
     const { data, error } = await supabase
       .from('questions') // Table name
       .select('*') // Fetch all columns
@@ -39,7 +41,26 @@ const getQuestionById = async (req, res) => {
       return res.status(404).json({ message: 'Question not found' }); // Handle case where question is not found
     }
 
-    res.json(data); // Respond with the full question data
+
+    console.log("Raw data from DB:", data);
+    const example_input=data.example_input;
+    const expected_output=data.expected_output;
+
+    const filteredExampleInput = Object.fromEntries(
+      Object.entries(example_input).slice(0,data.visible_test_cases)
+    );
+
+    const filteredExpectedOutput = Object.fromEntries(
+      Object.entries(expected_output).slice(0,data.visible_test_cases)
+    );
+
+    const formattedData = {
+      ...data,
+      example_input: filteredExampleInput,
+      expected_output: filteredExpectedOutput
+    };
+
+    res.json(formattedData); // Respond with the full question data
   } catch (error) {
     console.error('Error fetching question:', error.message);
     res.status(500).json({ message: 'Failed to fetch question', error: error.message });
@@ -64,6 +85,7 @@ const addQuestion = async (req, res) => {
     exampleInput,
     expectedOutput,
     constraint_data,
+    visible_test_cases
   } = req.body;
 
   if (!title || !description || !difficulty || !category || !exampleInput || !expectedOutput) {
@@ -84,7 +106,8 @@ const addQuestion = async (req, res) => {
           acceptance,
           example_input: exampleInput,  // Corrected field name
           expected_output: expectedOutput,  // Corrected field name
-          constraint_data, // Ensure this column exists in DB
+          constraint_data,
+          visible_test_cases // Ensure this column exists in DB
         },
       ]);
 
