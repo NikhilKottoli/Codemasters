@@ -31,17 +31,24 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   setcurrentOutput
 }) => {
   const [selectedTestCase, setSelectedTestCase] = useState<string>("1");
+  
 
   // Maintaining the original behavior exactly as in your code
   const handleTestCaseChange = (value: string) => {
     if (value === "custom") {
       setSelectedTestCase(value);
+      // console.log("Custom test case selected");
       return;
     }
     setSelectedTestCase(value);
+    
+    // console.log(`Test case ${value} selected`);
     setcurrentInput(example_input[value]);
     setcurrentOutput(expected_output[value]);
+    // console.log(currentInput, currentOutput);
+
   };
+
 
   const isCustom = selectedTestCase === "custom";
 

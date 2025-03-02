@@ -26,7 +26,7 @@ const getQuestionById = async (req, res) => {
 
   try {
     // Fetching a specific question by ID
-    console.log(questionId);
+    // console.log(questionId);
     const { data, error } = await supabase
       .from('questions') // Table name
       .select('*') // Fetch all columns
@@ -42,7 +42,7 @@ const getQuestionById = async (req, res) => {
     }
 
 
-    console.log("Raw data from DB:", data);
+    // console.log("Raw data from DB:", data);
     const example_input=data.example_input;
     const expected_output=data.expected_output;
 
@@ -71,8 +71,8 @@ const getQuestionById = async (req, res) => {
 
 
 const addQuestion = async (req, res) => {
-  console.log("addQuestion hit");
-  console.log(req.body);
+  // console.log("addQuestion hit");
+  // console.log(req.body);
 
   // Extract and validate data from request body
   const {

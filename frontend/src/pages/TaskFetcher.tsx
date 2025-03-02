@@ -6,12 +6,12 @@ import ActionBar from './ActionBar';
 import QuestionCard from './QuestionCard';
 import { TaskResult, createTask } from '../types/Task';
 import { FullQuestionProps } from '@/types/question';
-import { useQuestion, useSetQuestion } from '@/contexts/questionContext/useQuestion';
+
 
 // Helper function to normalize strings for comparison (was referenced but not defined)
-// const normalizeString = (str: string | null): string => {
-//   return str ? str.trim().replace(/\s+/g, ' ') : '';
-// };
+const normalizeString = (str: string | null): string => {
+  return str ? str.trim().replace(/\s+/g, ' ') : '';
+};
 
 
 
@@ -35,6 +35,8 @@ const TaskFetcher: React.FC = () => {
       axios.get(`http://localhost:3000/question/${questionId}`)
         .then(response => {
           setQuestion(response.data);
+          setCurrentInput(response.data.example_input["1"]);
+          setCurrentOutput(response.data.expected_output["1"]);
         })
         .catch(error => {
           console.error('Error fetching question details:', error);
@@ -46,6 +48,9 @@ const TaskFetcher: React.FC = () => {
     try {
       const response = await axios.get(`http://localhost:3000/task/${taskId}`);
       const data: TaskResult = response.data;
+      if(!data.output) {
+        setResult(data.output||null);
+      }
 
       if (data.status === 'completed' && data.output) {
         setResult(data.output);
@@ -90,14 +95,23 @@ const TaskFetcher: React.FC = () => {
       });
 
       if (actionType === 'run') {
+        console.log(
+          {
+            ...task,
+            action: actionType,
+            userId: userid,
+            stdin:currentInput,
+            output:currentOutput
+          }
+        );
         await axios.post(
           'http://localhost:3000/task',
           {
             ...task,
             action: actionType,
             userId: userid,
-            stdin: question?.selected_input,
-            output: question?.selected_output
+            stdin: currentInput,
+            output: currentOutput
           },
           { headers: { 'Content-Type': 'application/json' } }
         );
@@ -173,22 +187,22 @@ const TaskFetcher: React.FC = () => {
                 </p>
               </div>
             )}
-            {/* {result && (
+            {result && (
               <div
-                className={`mt-4 p-6 border rounded-lg shadow ${normalizeString(result) === normalizeString(question.expected_output) ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`}
+                className={`mt-4 p-6 border rounded-lg shadow ${normalizeString(result) === normalizeString(currentOutput) ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`}
               >
                 <h2
-                  className={`font-bold text-lg ${normalizeString(result) === normalizeString(question.expected_output) ? 'text-green-800' : 'text-red-800'} mb-2`}
+                  className={`font-bold text-lg ${normalizeString(result) === normalizeString(currentOutput) ? 'text-green-800' : 'text-red-800'} mb-2`}
                 >
-                  {normalizeString(result) === normalizeString(question.expected_output) ? 'Correct' : 'Wrong'}
+                  {normalizeString(result) === normalizeString(currentOutput) ? 'Correct' : 'Wrong'}
                 </h2>
                 <div className="bg-white p-4 rounded-md font-mono">
-                  <pre className={`whitespace-pre-wrap ${normalizeString(result) === normalizeString(question.expected_output) ? 'text-green-900' : 'text-red-900'}`}>
+                  <pre className={`whitespace-pre-wrap ${normalizeString(result) === normalizeString(currentOutput) ? 'text-green-900' : 'text-red-900'}`}>
                     {result}
                   </pre>
                 </div>
               </div>
-            )} */}
+            )}
             {error && (
               <div className="mt-4 p-6 bg-red-50 border border-red-500 rounded-lg shadow">
                 <h2 className="font-bold text-lg text-red-800 mb-2">Error:</h2>
