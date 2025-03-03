@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Code2, Loader2 } from 'lucide-react';
@@ -10,6 +10,15 @@ import { toast } from 'sonner';
 export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+      if (token) {
+        console.log('Token:', token);
+        window.location.href = '/questions';
+      }
+  }
+  , []);
+  
   // Define the type for form submission
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -37,6 +46,7 @@ export default function SignIn() {
 
       // If successful, optionally handle the token here (e.g., cookies or localStorage)
       toast.success('Signed in successfully');
+      window.location.href = '/questions';
       console.log('Token:', data.token);
     } catch (error: any) {
       toast.error(error.message || 'Failed to sign in');

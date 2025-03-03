@@ -4,6 +4,25 @@ const cors = require('cors');
 const taskRoutes = require('./routes/taskRoutes');
 const userRoutes = require('./routes/userRoutes');
 const questionRoutes = require('./routes/questionRoutes');
+
+const io = require('socket.io')(8080, {
+  cors: {
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST'],
+  }
+});
+
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  socket.on('send-changes', (content) => {
+    // console.log('Received changes:', content);
+    socket.broadcast.emit('receive-changes', content);});
+
+  socket.on('disconnect', () => {console.log('User disconnected');});
+});
+
+
 const supabase = require('./supabase')
 const { client } = require('./redisClient');
 const cookieParser = require('cookie-parser');
