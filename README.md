@@ -25,15 +25,6 @@
    npm run dev
    ```
 
-5. Create a new terminal and navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-6. Start the de-queue process to dequeue from Redis and send responses to Piston. The response will be logged onto your console.
-   ```bash
-    node sendPostRequestToPiston.js
-    ```
-
 ### Redis Setup
 - **Mac:**
   ```bash
