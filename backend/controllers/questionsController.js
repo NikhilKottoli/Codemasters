@@ -1,5 +1,5 @@
 const { format } = require('path');
-const supabase = require('../supabase'); // Import the Supabase client
+const {supabase, supabase1} = require('../supabase'); // Import the Supabase client
 
 // Get all questions title and some details
 const getAllQuestions = async (req, res) => {

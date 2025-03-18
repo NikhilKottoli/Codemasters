@@ -92,7 +92,7 @@ const Navbar = () => {
               Join Us
             </button>
           </div> */}
-
+        
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button

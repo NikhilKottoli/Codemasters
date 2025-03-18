@@ -4,6 +4,7 @@ const cors = require('cors');
 const taskRoutes = require('./routes/taskRoutes');
 const userRoutes = require('./routes/userRoutes');
 const questionRoutes = require('./routes/questionRoutes');
+const contestRoutes = require('./routes/contestRoutes');
 
 const io = require('socket.io')(8080, {
   cors: {
@@ -23,8 +24,9 @@ io.on('connection', (socket) => {
 });
 
 
-const supabase = require('./supabase')
-const { client } = require('./redisClient');
+// const supabase = require('./supabase')
+// const supabase1 = require('./supabase')
+// const { client } = require('./redisClient');
 const cookieParser = require('cookie-parser');
 
 const app = express();
@@ -37,6 +39,8 @@ app.use(cookieParser());
 app.use('/task', taskRoutes);
 app.use('/user',userRoutes);
 app.use('/question',questionRoutes)
+app.use('/contests',contestRoutes)
+
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
