@@ -111,6 +111,56 @@ node sendPostRequestToPiston.js
       "token": "string"
     }
     ```
+### Contest Endpoints
+- **Get All Contest**
+  - **URL:** `GET /contests/`
+  - **Response:**
+    ```json
+    [
+      {
+        "id": "string",
+        "name": "string",
+        "desc": "string",
+        "public": "bool",
+        "start_time": "timestampz",
+        "end_time": "timestampz"
+      }
+    ]
+    ```
+
+- **Get Question by ID**
+  - **URL:** `GET /contests/:id`
+  - **Response:**
+    ```json
+    {
+        "id": "string",
+        "name": "string",
+        "desc": "string",
+        "public": "bool",
+        "start_time": "timestampz",
+        "end_time": "timestampz"
+    }
+    ```
+
+- **Add New Question**
+  - **URL:** `POST /contests/`
+  - **Body:**
+    ```json
+    {
+        "name": "string",
+        "desc": "string",
+        "public": "bool",
+        "start_time": "timestampz",
+        "end_time": "timestampz"
+    }
+    ```
+  - **Response:**
+    ```json
+    {
+    
+    }
+    ```
+
 
 ### Question Endpoints
 - **Get All Questions**
