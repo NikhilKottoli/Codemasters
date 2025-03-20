@@ -1,18 +1,8 @@
 // const {supabase,supabase1} = require("../supabase");
 
 const axios = require('axios');
+const crypto = require("crypto");
 const { handleApiError } = require('../../utils/errorHandler');
-
-const checkcreds = async (req,res,next) => {
-  if(!req.body.apiKey || !req.body.secret){
-    return res.status(400).json({
-      status: "failed",
-      message: "API key and secret are required"
-    });
-  }
-else{
-  next();
-}}
 
 const verifyCredentials=async (req, res) => {
     try {
@@ -33,29 +23,36 @@ const verifyCredentials=async (req, res) => {
     }
   }
 
-const fetchproblems= async(req,res)=>{
+  const fetchproblems = async (req, res) => {
     try {
-      console.log("fetch problems hit ",req.body);
-        const { apiKey, secret ,id } = req.body;
-        // console.log(req.body);
-        const methodName = 'problems.list';
-
-        const params = {
-          apiKey: apiKey,
-          time: Math.floor(Date.now() / 1000)
-        };
-        if(id){
-          params.id=id;
-        }
-        
-      
-        
-        const data = await submitfxn(params, secret,methodName);
-        return res.status(200).json(data);
-      } catch (error) {
-        handleApiError(error, res, "Failed to fetch problems");
-      }
-}  
+      console.log("Fetching all problems...");
+  
+      const apiKey = process.env.POLYGON_KEY;
+      const secret = process.env.POLYGON_SECRET;
+      const methodName = "problems.list";
+      const time = Math.floor(Date.now() / 1000);
+      const rand = Math.random().toString(36).substring(2, 8);
+  
+      const params = { apiKey, time };
+      const sortedParams = Object.keys(params)
+        .sort()
+        .map((key) => `${key}=${params[key]}`)
+        .join("&");
+  
+      const hashString = `${rand}/${methodName}?${sortedParams}#${secret}`;
+      const apiSig = rand + crypto.createHash("sha512").update(hashString).digest("hex");
+  
+      const url = `https://polygon.codeforces.com/api/${methodName}?${sortedParams}&apiSig=${apiSig}`;
+  
+      const response = await fetch(url);
+      const data = await response.json();
+      console.log("Fetched all problems:", data);
+      return res.status(200).json(data);
+    } catch (error) {
+      console.error("Error fetching problems:", error);
+      res.status(500).json({ error: "Failed to fetch problems" });
+    }
+  };
 
   async function submitfxn (params, secret,methodName) {
     const rand = generateRandomString(6);
@@ -98,6 +95,6 @@ const fetchproblems= async(req,res)=>{
   
   
   module.exports = {
-    verifyCredentials,fetchproblems,checkcreds,submitfxn
+    verifyCredentials,fetchproblems,submitfxn
   };
 
