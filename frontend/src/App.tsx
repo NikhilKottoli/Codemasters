@@ -9,6 +9,9 @@ import Contests from './pages/Contest';
 import RealTimeEditor from './pages/RealTimeEditor';
 import Navbar from './components/Navbar';
 import { QuestionProvider } from './contexts/questionContext/questionContext';
+import PolygonHomePage from './pages/polygonHomePage';
+import PolygonProblem from './pages/polygonProblem';
+import CreateProblem from './components/polygonpages/CreateProblem';
 
 function App() {
   return (
@@ -23,6 +26,9 @@ function App() {
           <Route path="/editor" element={<RealTimeEditor />} />
           <Route path="/solve/:questionId" element={<TaskFetcher />} />
           <Route path="/addquestion" element={<AddQuestionForm />} />
+          <Route path="/polygon" element={<PolygonHomePage/>} />
+          <Route path="/polygon/:problemId" element={<PolygonProblem/>} />
+          <Route path="/polygon/create" element={<CreateProblem/>} />
         </Routes>
       <Toaster />
     </Router>

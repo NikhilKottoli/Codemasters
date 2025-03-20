@@ -5,6 +5,7 @@ const taskRoutes = require('./routes/taskRoutes');
 const userRoutes = require('./routes/userRoutes');
 const questionRoutes = require('./routes/questionRoutes');
 const contestRoutes = require('./routes/contestRoutes');
+const polygonRoutes =require('./routes/polygonRoutes')
 
 const io = require('socket.io')(8080, {
   cors: {
@@ -40,6 +41,7 @@ app.use('/task', taskRoutes);
 app.use('/user',userRoutes);
 app.use('/question',questionRoutes)
 app.use('/contests',contestRoutes)
+app.use('/polygon',polygonRoutes)
 
 app.get('/', (req, res) => {
   res.send('Hello World!');

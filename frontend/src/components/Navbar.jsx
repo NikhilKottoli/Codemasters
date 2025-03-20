@@ -35,7 +35,9 @@ const Navbar = () => {
               </a>
 
               <a href="/editor" className="text-white hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium">Real-Time Editor</a>
-
+              {/*  polygon */}
+                 
+              <a href="/polygon" className="text-white hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium">Polygon</a>
               {/* Programs dropdown */}
               <div className="relative">
                 <button 
