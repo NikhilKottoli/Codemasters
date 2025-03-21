@@ -23,7 +23,9 @@ class TaskProcessor {
       java: 'java'
     }[task.language] || 'txt';
 
-    const response = await axios.post('https://emkc.org/api/v2/piston/execute', {
+    
+    try {
+      const response = await axios.post('https://emkc.org/api/v2/piston/execute', {
       language: task.language,
       version: task.version || '*',
       files: [{
@@ -32,26 +34,64 @@ class TaskProcessor {
       }],
       stdin: task.stdin || ''
     });
-
+    response.data.run.status = "completed";
     return response.data;
+    } catch (error) {
+      console.error('Execution error:', error.message);
+      return { error: error.message};
+    }
   }
 
-  async storeResult(taskId, result, queueType = 'run') {
-    const resultData = {
-      taskId,
-      status: result.run ? 'completed' : 'error',
-      output: result.run ? result.run.output : result.error,
-      completedAt: new Date().toISOString()
-    };
+  async storeResult(taskId, result, queueType, expectedOutput) {
+    // Validate queue type
+    if (!this.resultQueues[queueType]) {
+      throw new Error(`Queue type "${queueType}" is not valid!`);
+    }
 
-    // Store result in Redis with expiration
-    await this.redis.setex(`result:${taskId}`, 300, JSON.stringify(resultData));
-    
-    // Push to appropriate results queue based on queue type
-    const resultQueue = this.resultQueues[queueType];
-    await this.redis.lpush(resultQueue, JSON.stringify(resultData));
+    try {
+      if (queueType === 'submit') {
+        let temp = (result.run?.output || "").replace(/\r?\n|\r/g, "\n").trim();
+        let updatedResult = {
+          ...result,
+          run: {
+            ...result.run,
+            output: temp === expectedOutput ? "Accepted" : "Wrong Answer",
+            status:"completed"
+          }
+        };
 
-    await this.redis.expire(resultQueue, 600);// Expire results queue after 10 mins
+        // Store result in Redis and manage queues
+        const resultQueue = this.resultQueues[queueType];
+        const resultJson = JSON.stringify(updatedResult);
+        
+        await this.redis.setex(`result:${taskId}`, 300, resultJson);
+        await this.redis.lpush(resultQueue, resultJson);
+        await this.redis.expire(resultQueue, 600); // Expire after 10 mins
+        
+        return updatedResult;
+      }
+      
+      // Prepare result data
+      let resultData = {
+        taskId,
+        status: result.run ? 'completed' : 'error',
+        output: result.run ? result.run.output : result.error,
+        completedAt: new Date().toISOString()
+      };
+
+      // Store result in Redis and manage queues
+      const resultQueue = this.resultQueues[queueType];
+      const resultJson = JSON.stringify(resultData);
+      
+      await this.redis.setex(`result:${taskId}`, 300, resultJson);
+      await this.redis.lpush(resultQueue, resultJson);
+      await this.redis.expire(resultQueue, 600); // Expire after 10 mins
+      
+      return resultData;
+    } catch (error) {
+      console.error(`Error storing result for task ${taskId}:`, error);
+      throw error; 
+    }
   }
 
   async processTask(taskData, queueType) {
@@ -61,11 +101,10 @@ class TaskProcessor {
       if (!task.taskId || !task.language || !task.code) {
         throw new Error('Invalid task format');
       }
-
-      console.log(`Processing ${queueType} task ${task.taskId}...`);
-      const result = await this.executeCode(task);
       
-      await this.storeResult(task.taskId, result, queueType);
+      console.log(`Processing ${queueType} task ${task.taskId}...`);
+      let result = await this.executeCode(task);
+      result = await this.storeResult(task.taskId, result, queueType,task.expectedOutput);
       console.log(`${queueType} task ${task.taskId} processed successfully`);
       return result;
     } catch (error) {

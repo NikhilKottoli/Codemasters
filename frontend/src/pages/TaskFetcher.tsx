@@ -8,10 +8,7 @@ import { TaskResult, createTask } from '../types/Task';
 import { FullQuestionProps } from '@/types/question';
 
 
-// Helper function to normalize strings for comparison (was referenced but not defined)
-const normalizeString = (str: string | null): string => {
-  return str ? str.trim().replace(/\s+/g, ' ') : '';
-};
+
 
 
 
@@ -26,10 +23,16 @@ const TaskFetcher: React.FC = () => {
   const [currentInput, setCurrentInput] = useState<string | null>(null);
   const [currentOutput, setCurrentOutput] = useState<string | null>(null);
   const userid = localStorage.getItem('token');
+  const [submission, setSubmission] = useState(false);
 
   // Fetch question details from the API using questionId
   const [question, setQuestion] = useState<FullQuestionProps | null>(null);
   
+  // Helper function to normalize strings for comparison (was referenced but not defined)
+  const normalizeString = (str: string | null): string => {
+    return (str ? str.trim().replace(/\s+/g, ' ') : '');
+  };
+
   useEffect(() => {
     if (questionId) {
       axios.get(`http://localhost:3000/question/${questionId}`)
@@ -48,20 +51,18 @@ const TaskFetcher: React.FC = () => {
     }
   }, [questionId]);
    
-  const pollTaskResult = async (taskId: string): Promise<void> => {
+  const pollTaskResult = async (taskId: string) => {
     try {
-      const response = await axios.get(`http://localhost:3000/task/${taskId}`);
-      const data: TaskResult = response.data;
-      if(!data.output) {
-        setResult(data.output||null);
-      }
-
-      if (data.status === 'completed' && data.output) {
-        setResult(data.output);
+      setSubmission(false);
+      const { data } = await axios.get(`http://localhost:3000/task/${taskId}`);
+      console.log(data);
+      if (data.run.status === "completed") {
+        if(data.run.output != "Wrong Answer")setSubmission(true);
+        setResult(data.run.output || null);
         setIsPolling(false);
         setIsLoading(false);
-      } else if (data.status === 'failed') {
-        setError('Task processing failed');
+      } else if (data.run.status === "failed") {
+        setError("Task processing failed");
         setIsPolling(false);
         setIsLoading(false);
       } else {
@@ -71,12 +72,12 @@ const TaskFetcher: React.FC = () => {
       if (axios.isAxiosError(err) && err.response?.status === 404) {
         setTimeout(() => pollTaskResult(taskId), 500);
       } else {
-        setError(err instanceof Error ? err.message : 'Failed to fetch result');
+        setError(err.message || "Failed to fetch result");
         setIsPolling(false);
         setIsLoading(false);
       }
     }
-  };
+  };  
 
   const handleLanguageChange = (newLanguage: string): void => {
     setLanguage(newLanguage);
@@ -98,44 +99,20 @@ const TaskFetcher: React.FC = () => {
         questionId
       });
 
-      if (actionType === 'run') {
-        console.log(
-          {
-            ...task,
-            action: actionType,
-            userId: userid,
-            stdin:currentInput,
-            output:currentOutput
-          }
-        );
-        await axios.post(
-          'http://localhost:3000/task',
-          {
-            ...task,
-            action: actionType,
-            userId: userid,
-            stdin: (currentInput),
-            output: currentOutput
-          },
-          { headers: { 'Content-Type': 'application/json' } }
-        );
-        setIsPolling(true);
-        pollTaskResult(task.taskId);
-        return;
-      } else if (actionType === 'submit') {
-        await axios.post(
-          'http://localhost:3000/task',
-          {
-            ...task,
-            action: actionType,
-            userId: userid
-          },
-          { headers: { 'Content-Type': 'application/json' } }
-        );
-        setIsPolling(true);
-        pollTaskResult(task.taskId);
-        return;
-      }
+      await axios.post(
+        'http://localhost:3000/task',
+        {
+          ...task,
+          action: actionType,
+          userId: userid,
+          stdin: (currentInput),
+          output: currentOutput
+        },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+      setIsPolling(true);
+      pollTaskResult(task.taskId);
+      
     } catch (error) {
       setError(error instanceof Error ? error.message : `Failed to ${actionType} code`);
       setIsLoading(false);
@@ -193,15 +170,15 @@ const TaskFetcher: React.FC = () => {
             )}
             {result && (
               <div
-                className={`mt-4 p-6 border rounded-lg shadow ${normalizeString(result) === normalizeString(currentOutput) ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`}
+                className={`mt-4 p-6 border rounded-lg shadow ${submission || (normalizeString(result) === normalizeString(currentOutput)) ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`}
               >
                 <h2
-                  className={`font-bold text-lg ${normalizeString(result) === normalizeString(currentOutput) ? 'text-green-800' : 'text-red-800'} mb-2`}
+                  className={`font-bold text-lg ${(submission || normalizeString(result) === normalizeString(currentOutput)) ? 'text-green-800' : 'text-red-800'} mb-2`}
                 >
-                  {normalizeString(result) === normalizeString(currentOutput) ? 'Correct' : 'Wrong'}
+                  {submission || (normalizeString(result) === normalizeString(currentOutput)) ? 'Correct' : 'Wrong'}
                 </h2>
                 <div className="bg-white p-4 rounded-md font-mono">
-                  <pre className={`whitespace-pre-wrap ${normalizeString(result) === normalizeString(currentOutput) ? 'text-green-900' : 'text-red-900'}`}>
+                  <pre className={`whitespace-pre-wrap ${submission || (normalizeString(result) === normalizeString(currentOutput)) ? 'text-green-900' : 'text-red-900'}`}>
                     {result}
                   </pre>
                 </div>
