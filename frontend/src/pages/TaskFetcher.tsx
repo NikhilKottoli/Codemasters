@@ -34,8 +34,12 @@ const TaskFetcher: React.FC = () => {
     if (questionId) {
       axios.get(`http://localhost:3000/question/${questionId}`)
         .then(response => {
+          for(let i =1;i<=response.data.visible_test_cases;i++){
+            response.data.example_input[i] = "1\n" + response.data.example_input[i];
+          }
           setQuestion(response.data);
           setCurrentInput(response.data.example_input["1"]);
+
           setCurrentOutput(response.data.expected_output["1"]);
         })
         .catch(error => {
@@ -110,7 +114,7 @@ const TaskFetcher: React.FC = () => {
             ...task,
             action: actionType,
             userId: userid,
-            stdin: currentInput,
+            stdin: (currentInput),
             output: currentOutput
           },
           { headers: { 'Content-Type': 'application/json' } }
