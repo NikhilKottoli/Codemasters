@@ -23,6 +23,7 @@ const getScript = async (req, res) => {
       });
     } catch (error) {
       handleApiError(error, res, "Failed to get script");
+     
     }
   };
   

@@ -82,6 +82,9 @@ const getSolutions = async (req, res) => {
       if (pin) params.pin = pin;
       
       const data = await submitfxn(params, secret, 'problem.viewSolution');
+      
+    
+
       return res.status(200).json({
         status: "success",
         solutionContent: data

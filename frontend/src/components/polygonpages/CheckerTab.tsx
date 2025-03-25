@@ -53,9 +53,11 @@ export const CheckerTab: React.FC<{  apiKey: string, secret: string, problemId: 
             });
             
             const data = await response.text();
-            setCheckerCode(data);
+            const content = await JSON.parse(data);
+            setCheckerCode(content.file);
         } catch (error) {
             console.error("Error fetching checker code:", error);
+            
         } finally {
             setLoading(false);
         }

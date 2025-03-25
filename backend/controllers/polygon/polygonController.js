@@ -37,7 +37,6 @@ const fetchproblems= async(req,res)=>{
     try {
       console.log("fetch problems hit ",req.body);
         const { apiKey, secret ,id } = req.body;
-        // console.log(req.body);
         const methodName = 'problems.list';
 
         const params = {
@@ -70,6 +69,10 @@ const fetchproblems= async(req,res)=>{
       },
       body: new URLSearchParams(params)
     });
+    if(methodName==='problem.viewFile'||methodName==='problem.viewSolution'||methodName==='problem.script'){
+      const text = await response.text();
+      return text;
+    }
      return response.json();
   }
   

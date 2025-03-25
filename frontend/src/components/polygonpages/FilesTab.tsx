@@ -101,8 +101,10 @@ export const FilesTab: React.FC<{ apiKey: string, secret: string, problemId: str
                 })
             });
             
-            const content = await response.text();
-            setViewingContent(content);
+            
+            const data =await response.text();
+            const content = JSON.parse(data);
+            setViewingContent(content.file);
         } catch (error) {
             console.error("Error viewing file:", error);
         } finally {

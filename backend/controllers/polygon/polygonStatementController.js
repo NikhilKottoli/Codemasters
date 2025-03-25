@@ -40,9 +40,18 @@ const getStatements = async (req, res) => {
         apiKey: apiKey,
         time: Math.floor(Date.now() / 1000),
         problemId: problemId,
-        lang: lang,
-        ...statementData // This includes name, legend, input, output, etc.
+        lang: lang // This includes name, legend, input, output, etc.
       };
+
+      //add the values to the params only if the valus is not empyt
+
+      for (const [key, value] of Object.entries(statementData)) {
+        if (value) {
+          params[key] = value;
+        }
+      }
+
+      
 
       if (pin) params.pin = pin;
       console.log("save statement params", params);

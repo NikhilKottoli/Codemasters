@@ -83,12 +83,14 @@ const getFiles = async (req, res) => {
       if (pin) params.pin = pin;
       
       const data = await submitfxn(params, secret, 'problem.viewFile');
+     
       return res.status(200).json({
         status: "success",
-        fileContent: data
+        file: data
       });
     } catch (error) {
       handleApiError(error, res, "Failed to view file");
+      // console.log("error",error);
     }
   };
   

@@ -14,7 +14,6 @@ export const ScriptTab: React.FC<{apiKey: string, secret: string, problemId: str
     }, []);
     useEffect(() => {
         if (script) {setScriptCode(script || '');
-            console.log("Script:",script);
         }
         
     }, [script]);

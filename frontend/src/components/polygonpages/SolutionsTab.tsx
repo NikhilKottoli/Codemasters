@@ -50,8 +50,9 @@ export const SolutionsTab: React.FC<{  apiKey: string, secret: string, problemId
                 })
             });
             
-            const content = await response.text();
-            setSolutionContent(content);
+            const data = await response.text();
+            const content = await JSON.parse(data);
+            setSolutionContent(content.solutionContent);
         } catch (error) {
             console.error("Error viewing solution:", error);
         } finally {
