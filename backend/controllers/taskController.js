@@ -4,7 +4,7 @@ const {supabase,supabase1} = require("../supabase");
 const executeTask = async (req, res) => {
   // console.log('Received submission:', req.body);
 
-  const { language, userId, code, action, stdin } = req.body;
+  const { language, userId, code, action, stdin,questionId,output } = req.body;
   try {
    
     if (!language || !userId || !code || !action ) {
@@ -15,8 +15,7 @@ const executeTask = async (req, res) => {
     }
 
   if(req.body.action === 'run') {
-    const { language, userId, code, action,stdin,output } = req.body;
-
+    
     // Validate required field
     if(!stdin||!output){ 
       return res.status(400).json({ error: 'Missing required fields' });
@@ -31,38 +30,34 @@ const executeTask = async (req, res) => {
       message: 'Submission added successfully', 
     });
   } else {
-
-  
-    const { language, userId, code, action } = req.body;
-
-    // Validate required field
-   
-
-    // Determine the queue based on the action
     let queue = 'submitQueue';
 
-    // If it's a submitQueue, store the submission in Supabase
-    
-      const { data, error } = await supabase
-        .from('submission')
-        .insert([
-          {
-            user_id: userId,
-            code: code,
-            language: language,
-          },
-        ]);
+    const { data: data1, error: error1 } = await supabase
+      .from('questions')
+      .select('example_input, expected_output')
+      .eq('id', questionId)
+      .single();
 
-      if (error) {
-        console.error('Error inserting into Supabase:', error);
-        return res.status(500).json({ error: 'Failed to insert submission into Supabase' });
-      }
-    
-
-    // Add task to the appropriate Redis queue
+    const totalTestCases = Object.keys(data1?.example_input || {}).length;
+    req.body.stdin = totalTestCases + "\n" +Object.values(data1?.example_input || {}).join("\n");
+    req.body.expectedOutput = Object.values(data1?.expected_output || {}).join("\n");
     await Promise.all([
       client.lPush(queue, JSON.stringify(req.body)),
     ]);
+    
+    const { data, error } = await supabase
+      .from('submission')
+      .insert([
+        {
+          user_id: userId,
+          code: code,
+          language: language,
+        },
+      ]);
+    if (error) {
+      console.error('Error inserting into Supabase:', error);
+      return res.status(500).json({ error: 'Failed to insert submission into Supabase' });
+    }
 
     res.status(200).json({ 
       message: 'Submission added successfully', 
@@ -84,10 +79,10 @@ const getTaskResultById = async (req, res) => {
     if (!result) {
       return res.status(404).json({ message: `No result found for task with ID: ${id}` });
     }
-    console.log("computed result");
-    console.log(result);
+    // console.log("computed result");
+    // console.log(result);
     const parsedResult = JSON.parse(result);
-    console.log(`Result for task ${id}:`, parsedResult);
+    // console.log(`Result for task ${id}:`, parsedResult);
     res.status(200).json(parsedResult);
   } catch (error) {
     console.error('Error fetching task result:', error.message);

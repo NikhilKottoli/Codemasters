@@ -31,7 +31,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   setcurrentOutput
 }) => {
   const [selectedTestCase, setSelectedTestCase] = useState<string>("1");
-  
 
   // Maintaining the original behavior exactly as in your code
   const handleTestCaseChange = (value: string) => {
@@ -48,6 +47,10 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     // console.log(currentInput, currentOutput);
 
   };
+
+  useEffect(() => {
+    
+  }, [example_input]);
 
 
   const isCustom = selectedTestCase === "custom";
@@ -87,6 +90,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       </div>
 
       <div className="space-y-4">
+        <p>The first line of input will contain a single integer T,denoting the number of test cases.</p>
         <h3 className="font-semibold text-sm">Select Test Case:</h3>
         <Select onValueChange={handleTestCaseChange} defaultValue="1">
           <SelectTrigger className="w-full">
@@ -104,7 +108,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           <h3 className='py-2'>Input:</h3>
           <Textarea
             className="w-full"
-            value={isCustom ? currentInput ?? '' : example_input[selectedTestCase] ?? ''}
+            value={isCustom ? (currentInput ?? '') : ((example_input[selectedTestCase] ?? ''))}
             onChange={(e) => isCustom && setcurrentInput(e.target.value)}
             disabled={!isCustom}
           />

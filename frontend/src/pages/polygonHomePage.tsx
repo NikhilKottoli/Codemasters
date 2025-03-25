@@ -5,6 +5,7 @@ import { StarIcon, LockIcon, PencilIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import {PolygonProblemType} from "../types/polygon";
+import { set } from "react-hook-form";
 
 interface ProblemTileProps {
     problem: PolygonProblemType;
@@ -114,7 +115,13 @@ const PolygonHomePage = () => {
     if (loading) return <div className="container">Loading...</div>;
 
     function handleSubmit(event: FormEvent<HTMLFormElement>): void {
-        throw new Error("Function not implemented.");
+        event.preventDefault();
+        const form = event.currentTarget as HTMLFormElement;
+        const formData = new FormData(form);
+        const apiKey = formData.get('apiKey') as string;
+        const secret = formData.get('secret') as string;
+        localStorage.setItem('polygoncreds', JSON.stringify({ apiKey, secret }));
+        window.location.reload();
     }
 
     return (!secret || !apiKey) ? (
