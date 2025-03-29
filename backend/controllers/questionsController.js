@@ -1,19 +1,18 @@
 const { format } = require('path');
 const {supabase, supabase1} = require('../supabase'); // Import the Supabase client
 
-// Get all questions title and some details
 const getAllQuestions = async (req, res) => {
   try {
     // Fetching questions from Supabase
     const { data, error } = await supabase
       .from('questions')  // Table name
-      .select('id, title, difficulty, category'); // Fetch only necessary columns
+      .select('id, title, difficulty, category');
 
     if (error) {
-      throw error;  // Throw error if there is any issue with the query
+      throw error;
     }
 
-    res.json(data); // Respond with the data
+    res.json(data);
   } catch (error) {
     console.error('Error fetching questions:', error.message);
     res.status(500).json({ message: 'Failed to fetch questions', error: error.message });
@@ -67,9 +66,6 @@ const getQuestionById = async (req, res) => {
   }
 };
 
-
-
-
 const addQuestion = async (req, res) => {
   // console.log("addQuestion hit");
   // console.log(req.body);
@@ -122,5 +118,22 @@ const addQuestion = async (req, res) => {
   }
 };
 
+const getMcqs = async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('mcq')  // Table name
+      .select('*');
 
-module.exports = { addQuestion ,getAllQuestions,getQuestionById };
+    if (error) {
+      throw error;
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching mcqs:', error.message);
+    res.status(500).json({ message: 'Failed to fetch mcqs', error: error.message });
+  }
+}
+
+
+module.exports = { addQuestion ,getAllQuestions,getQuestionById,getMcqs};

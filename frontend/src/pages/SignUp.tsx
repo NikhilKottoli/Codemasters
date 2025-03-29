@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
 
 export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
@@ -27,13 +26,16 @@ export default function SignUp() {
       const response = await fetch("http://localhost:3000/user/signup", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json", // Set content type as JSON
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(data), // Send the data as a JSON string
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
         throw new Error("Sign up failed");
+      }
+      else {
+        window.location.href = "/";
       }
 
       toast.success("Account created successfully");

@@ -1,9 +1,9 @@
-const {supabase,supabase1} = require("../supabase");
+const {supabase} = require("../supabase");
 
 // Get all contests
 const getContests = async (req, res) => {
    try {
-      const { data, error } = await supabase1
+      const { data, error } = await supabase
       .from("contests")
       .select("*");
       if (error) throw error;
@@ -28,7 +28,7 @@ const addContest = async (req, res) => {
       return res.status(400).json({ message: "Please fill in all fields" });
       }
       try {
-         const { data, error } = await supabase1
+         const { data, error } = await supabase
          .from("contests")
          .insert([
             {
@@ -51,7 +51,7 @@ const addContest = async (req, res) => {
 // Get a contest
 const getContest = async (req, res) => {
    try {
-      const { data, error } = await supabase1
+      const { data, error } = await supabase
       .from("contests")
       .select("*")
       .eq("id", req.params.id);

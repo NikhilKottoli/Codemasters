@@ -1,7 +1,8 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
-// Define the types for a contest
+// Define Contest type based on your actual data structure
 interface Contest {
   id: number;
   name: string;
@@ -11,222 +12,144 @@ interface Contest {
   end_time: string;
 }
 
-// Define the types for the form data
-interface FormData {
-  name: string;
-  desc: string;
-  public: boolean;
-  start_time: string;
-  end_time: string;
-}
+const ContestDetailsPage: React.FC = () => {
+  const [contest, setContest] = useState<Contest | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const { id } = useParams<{ id: string }>();
 
-const Contests: React.FC = () => {
-  const [contests, setContests] = useState<Contest[]>([]); // State for contests
-  const [formData, setFormData] = useState<FormData>({
-    name: "",
-    desc: "",
-    public: false,
-    start_time: "",
-    end_time: "",
-  });
-  const [error, setError] = useState<string>(""); // State for error messages
-  const [success, setSuccess] = useState<string>(""); // State for success messages
-
-  // Fetch all contests
   useEffect(() => {
-    const fetchContests = async () => {
+    const fetchContest = async () => {
       try {
-        const response = await axios.get<Contest[]>("http://localhost:3000/contests");
-        setContests(response.data);
+        setLoading(true);
+        const response = await axios.get(`http://localhost:3000/contests/${id}`);
+        setContest(response.data[0]); // API returns an array with one contest
       } catch (err) {
-        console.error("Error fetching contests:", err);
+        setError('Failed to load contest details');
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchContests();
-  }, []);
-
-  // Handle form input changes
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type, checked } = e.target as HTMLInputElement;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
-  };
-
-  // Handle form submission
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-
-    try {
-      const response = await axios.post<Contest>("http://localhost:3000/contests", formData);
-      setSuccess("Contest added successfully!");
-      setContests([...contests, response.data]); // Add the new contest to the list
-      setFormData({
-        name: "",
-        desc: "",
-        public: false,
-        start_time: "",
-        end_time: "",
-      });
-    } catch (err: any) {
-      console.error("Error adding contest:", err.message);
-      setError("Failed to add contest. Please try again.");
+    if (id) {
+      fetchContest();
     }
+  }, [id]);
+
+  // Format date and time for display
+  const formatDateTime = (dateTimeString: string) => {
+    const date = new Date(dateTimeString);
+    return date.toLocaleString();
   };
 
-  // Filter contests into ongoing and upcoming
-  const now = new Date();
-  const ongoingContests = contests.filter(
-    (contest) => new Date(contest.start_time) <= now && new Date(contest.end_time) >= now
-  );
-  const upcomingContests = contests.filter(
-    (contest) => new Date(contest.start_time) > now
-  );
+  // Calculate if contest is active, upcoming, or ended
+  const getContestStatus = () => {
+    if (!contest) return '';
+    
+    const now = new Date();
+    const startTime = new Date(contest.start_time);
+    const endTime = new Date(contest.end_time);
+    
+    if (now < startTime) return 'upcoming';
+    if (now > endTime) return 'ended';
+    return 'active';
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error || !contest) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h2 className="text-2xl font-bold text-red-600">Error</h2>
+        <p className="mt-2">{error || 'Contest not found'}</p>
+        <button 
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          onClick={() => window.history.back()}
+        >
+          Go Back
+        </button>
+      </div>
+    );
+  }
+
+  const contestStatus = getContestStatus();
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Contests</h1>
+    <div className="container mx-auto px-4 py-8">
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold mb-2">{contest.name}</h1>
+          <div className="flex items-center space-x-3">
+            <span className={`px-3 py-1 rounded-full text-sm font-medium 
+              ${contestStatus === 'active' ? 'bg-green-100 text-green-800' : 
+                contestStatus === 'upcoming' ? 'bg-blue-100 text-blue-800' : 
+                'bg-gray-100 text-gray-800'}`}>
+              {contestStatus}
+            </span>
+            <span className={`px-3 py-1 rounded-full text-sm font-medium 
+              ${contest.public ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}`}>
+              {contest.public ? 'Public' : 'Private'}
+            </span>
+          </div>
+        </div>
 
-      {/* Display success or error messages */}
-      {success && <p className="text-green-500 mb-4">{success}</p>}
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <h2 className="text-xl font-semibold mb-2">Description</h2>
+            <p className="text-gray-700 whitespace-pre-line">{contest.desc}</p>
+          </div>
+          
+          <div className="bg-gray-50 p-4 rounded">
+            <h2 className="text-xl font-semibold mb-4">Contest Information</h2>
+            <div className="space-y-3">
+              <div>
+                <span className="font-medium text-gray-600">Contest ID:</span>
+                <span className="ml-2">{contest.id}</span>
+              </div>
+              <div>
+                <span className="font-medium text-gray-600">Start Time:</span>
+                <span className="ml-2">{formatDateTime(contest.start_time)}</span>
+              </div>
+              <div>
+                <span className="font-medium text-gray-600">End Time:</span>
+                <span className="ml-2">{formatDateTime(contest.end_time)}</span>
+              </div>
+              <div>
+                <span className="font-medium text-gray-600">Visibility:</span>
+                <span className="ml-2">{contest.public ? 'Public' : 'Private'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      {/* Ongoing Contests Table */}
-      <h2 className="text-2xl font-bold mb-4">Ongoing Contests</h2>
-      <div className="overflow-x-auto mb-6">
-        <table className="table-auto w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-300 px-4 py-2">ID</th>
-              <th className="border border-gray-300 px-4 py-2">Name</th>
-              <th className="border border-gray-300 px-4 py-2">Description</th>
-              <th className="border border-gray-300 px-4 py-2">Public</th>
-              <th className="border border-gray-300 px-4 py-2">Start Time</th>
-              <th className="border border-gray-300 px-4 py-2">End Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ongoingContests.map((contest) => (
-              <tr key={contest.id} className="hover:bg-gray-50">
-                <td className="border border-gray-300 px-4 py-2">{contest.id}</td>
-                <td className="border border-gray-300 px-4 py-2">{contest.name}</td>
-                <td className="border border-gray-300 px-4 py-2">{contest.desc}</td>
-                <td className="border border-gray-300 px-4 py-2">{contest.public ? "Yes" : "No"}</td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {new Date(contest.start_time).toLocaleString()}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {new Date(contest.end_time).toLocaleString()}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="flex justify-end mt-6">
+          <button 
+            className="px-4 py-2 bg-gray-200 text-gray-800 rounded mr-2 hover:bg-gray-300"
+            onClick={() => window.history.back()}
+          >
+            Back
+          </button>
+          {contestStatus !== 'ended' && (
+            <button 
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              {contestStatus === 'upcoming' ? 'Register' : 'Enter Contest'}
+            </button>
+          )}
+          <button className='px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 mx-3' onClick={() => window.location.href = `/contest/${contest.id}/editor`}>
+            Edit
+          </button>
+        </div>
       </div>
-
-      {/* Upcoming Contests Table */}
-      <h2 className="text-2xl font-bold mb-4">Upcoming Contests</h2>
-      <div className="overflow-x-auto mb-6">
-        <table className="table-auto w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-300 px-4 py-2">ID</th>
-              <th className="border border-gray-300 px-4 py-2">Name</th>
-              <th className="border border-gray-300 px-4 py-2">Description</th>
-              <th className="border border-gray-300 px-4 py-2">Public</th>
-              <th className="border border-gray-300 px-4 py-2">Start Time</th>
-              <th className="border border-gray-300 px-4 py-2">End Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {upcomingContests.map((contest) => (
-              <tr key={contest.id} className="hover:bg-gray-50">
-                <td className="border border-gray-300 px-4 py-2">{contest.id}</td>
-                <td className="border border-gray-300 px-4 py-2">{contest.name}</td>
-                <td className="border border-gray-300 px-4 py-2">{contest.desc}</td>
-                <td className="border border-gray-300 px-4 py-2">{contest.public ? "Yes" : "No"}</td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {new Date(contest.start_time).toLocaleString()}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {new Date(contest.end_time).toLocaleString()}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Add Contest Form */}
-      <h2 className="text-2xl font-bold mb-4">Add Contest</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Name:</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded px-3 py-2"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Description:</label>
-          <textarea
-            name="desc"
-            value={formData.desc}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded px-3 py-2"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Public:</label>
-          <input
-            type="checkbox"
-            name="public"
-            checked={formData.public}
-            onChange={handleChange}
-            className="mr-2"
-          />
-          <span>Is this contest public?</span>
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Start Time:</label>
-          <input
-            type="datetime-local"
-            name="start_time"
-            value={formData.start_time}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded px-3 py-2"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">End Time:</label>
-          <input
-            type="datetime-local"
-            name="end_time"
-            value={formData.end_time}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded px-3 py-2"
-          />
-        </div>
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          Add Contest
-        </button>
-      </form>
     </div>
   );
 };
 
-export default Contests;
+export default ContestDetailsPage;
