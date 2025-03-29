@@ -63,4 +63,24 @@ const getContest = async (req, res) => {
       }
 };
 
-module.exports = { getContests, addContest, getContest };
+const addQuestions = async (req, res) => {
+   const { questions, mcq } = req.body;
+   const { id } = req.params;
+   const MCQ = mcq;
+   if (!questions) {
+      return res.status(400).json({ message: "Please fill in all fields" });
+   }
+   try {
+      const { data, error } = await supabase
+         .from("contests")
+         .update({ questions, MCQ })
+         .eq("id", id);
+      if (error) throw error;
+      res.json(data);
+   } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error adding questions" });
+   }
+}
+
+module.exports = { getContests, addContest, getContest, addQuestions };

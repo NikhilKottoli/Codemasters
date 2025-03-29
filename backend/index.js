@@ -24,10 +24,6 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {console.log('User disconnected');});
 });
 
-
-// const supabase = require('./supabase')
-// const supabase1 = require('./supabase')
-// const { client } = require('./redisClient');
 const cookieParser = require('cookie-parser');
 
 const app = express();

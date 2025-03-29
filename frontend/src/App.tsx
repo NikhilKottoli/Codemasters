@@ -34,7 +34,7 @@ function App() {
           <Route path="/polygon/:problemId" element={<PolygonProblem/>} />
           <Route path="/polygon/create" element={<CreateProblem/>} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/contest/:contestId/editor" element={<ContestQuestionsEditor />} />
+          <Route path="/contest/editor/:id" element={<ContestQuestionsEditor />} />
         </Routes>
       <Toaster />
     </Router>

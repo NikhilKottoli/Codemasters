@@ -1,4 +1,4 @@
-const {supabase,supabase1} = require("../supabase");
+const {supabase} = require("../supabase");
 const bcrypt = require('bcrypt');
 
 const serveSigninPage = (req, res) => {

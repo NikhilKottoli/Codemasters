@@ -143,7 +143,7 @@ const ContestDetailsPage: React.FC = () => {
               {contestStatus === 'upcoming' ? 'Register' : 'Enter Contest'}
             </button>
           )}
-          <button className='px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 mx-3' onClick={() => window.location.href = `/contest/${contest.id}/editor`}>
+          <button className='px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 mx-3' onClick={() => window.location.href = `/contest/editor/${contest.id}`}>
             Edit
           </button>
         </div>

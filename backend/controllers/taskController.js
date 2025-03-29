@@ -1,5 +1,5 @@
 const { client } = require('../redisClient');
-const {supabase,supabase1} = require("../supabase");
+const {supabase} = require("../supabase");
 
 const executeTask = async (req, res) => {
   // console.log('Received submission:', req.body);

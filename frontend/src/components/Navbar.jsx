@@ -73,7 +73,7 @@ const Navbar = () => {
                 {activeDropdown === 'events' && (
                   <div className="absolute z-10 -ml-4 mt-1 transform w-56 rounded-md shadow-lg bg-white">
                     <div className="rounded-md bg-gradient-to-br from-blue-800 to-black shadow-xs py-1">
-                      <a href="#" className="block px-4 py-2 text-sm text-gray-100 hover:bg-blue-700">Hackathons</a>
+                      <a href="/contests" className="block px-4 py-2 text-sm text-gray-100 hover:bg-blue-700">Contests</a>
                       <a href="#" className="block px-4 py-2 text-sm text-gray-100 hover:bg-blue-700">Workshops</a>
                       <a href="#" className="block px-4 py-2 text-sm text-gray-100 hover:bg-blue-700">Webinars</a>
                       <a href="#" className="block px-4 py-2 text-sm text-gray-100 hover:bg-blue-700">Competitions</a>
@@ -82,9 +82,9 @@ const Navbar = () => {
                 )}
               </div>
 
-              <a href="#" className="text-white hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium flex items-center">
+              <a href="/profile" className="text-white hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium flex items-center">
                 <Users className="w-4 h-4 mr-1" />
-                Team
+                Profile
               </a>
             </div>
           </div>
@@ -142,7 +142,7 @@ const Navbar = () => {
             </button>
             {activeDropdown === 'mobileEvents' && (
               <div className="pl-4 space-y-1">
-                <a href="#" className="text-gray-300 block px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-800">Hackathons</a>
+                <a href="/contests" className="text-gray-300 block px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-800">Contests</a>
                 <a href="#" className="text-gray-300 block px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-800">Workshops</a>
                 <a href="#" className="text-gray-300 block px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-800">Webinars</a>
                 <a href="#" className="text-gray-300 block px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-800">Competitions</a>
