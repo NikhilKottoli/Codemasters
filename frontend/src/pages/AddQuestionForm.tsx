@@ -17,6 +17,7 @@ interface QuestionFormData {
   timeLimit: string;
   acceptance: string;
   visibleTestCases:number;
+  numTestCases:number;
   exampleInput: object;
   expectedOutput: object;
   constraintData: string;
@@ -35,6 +36,7 @@ export const AddQuestionForm = () => {
     timeLimit: "",
     acceptance: "",
     visibleTestCases:0,
+    numTestCases:0,
     exampleInput: {1:""},
     expectedOutput:{1:""},
     constraintData: "",
@@ -68,22 +70,16 @@ export const AddQuestionForm = () => {
         setFormData((prev) => ({
             ...prev,
             ...data.QuestionData,
-            exampleInput: Object.fromEntries(
-              Object.entries(data.QuestionData.exampleInput).map(([key, val]) => [key, val.replace(/\r\n/g, '\n')])
-          ),  // Ensure it's always an object
-            expectedOutput: data.QuestionData.exampleOutput || {} // Ensure it's always an object
+            exampleInput:data.QuestionData.exampleInput || {},  // Ensure it's always an object
+            expectedOutput: data.QuestionData.exampleOutput || {}, // Ensure it's always an object
+            numTestCases:data.QuestionData.exampleInput.length
         }));
     }
 
     
   
 
-    setFormData(prev => ({
-      ...prev,
-      exampleInput: Object.fromEntries(
-          Object.entries(data.QuestionData.exampleInput).map(([key, val]) => [key, val.replace(/\r\n/g, '\n')])
-      )
-  }));
+  
   
     
       // console.log(formData)
@@ -100,19 +96,24 @@ export const AddQuestionForm = () => {
 }
   
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>, field: keyof QuestionFormData) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>, field: keyof QuestionFormData) => {
     setFormData({
       ...formData,
       [field]: e.target.value,
     });
   };
 
-  // const handleFieldChange =(index:number,type:'input'|'output',value:string)=>{
-  //   const updatedFields= [...fields];
-  //   updatedFields[index][type]=value;
-  //   setFields(updatedFields)
+  const handleInputChange =(index:string,value:string)=>{
+    const updatedFields= {...formData.exampleInput,[index]:value};
+    setFormData({...formData,exampleInput:updatedFields})
 
-  // }
+  }
+  const handleOutputChange =(index:string,value:string)=>{
+    const updatedFields= {...formData.expectedOutput,[index]:value};
+    setFormData({...formData,expectedOutput:updatedFields})
+
+  }
+ 
 
   const addField = () => {
     const newIndex = Object.keys(formData.exampleInput).length + 1;
@@ -120,6 +121,7 @@ export const AddQuestionForm = () => {
       ...prev,
       exampleInput: { ...prev.exampleInput, [newIndex]: "" },
       expectedOutput: { ...prev.expectedOutput, [newIndex]: "" },
+      numTestCases:newIndex
     }));
   };
 
@@ -147,6 +149,7 @@ export const AddQuestionForm = () => {
           timeLimit: "",
           acceptance: "",
           visibleTestCases:0,
+          numTestCases:0,
           exampleInput: {1:""},
           expectedOutput:{1:""},
           constraintData: "",
@@ -179,19 +182,19 @@ export const AddQuestionForm = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label>Title</Label>
-              <Input value={formData.title} onChange={(e) => handleInputChange(e, "title")} placeholder="Enter question title" />
+              <Input value={formData.title} onChange={(e) => handleChange(e, "title")} placeholder="Enter question title" />
             </div>
 
             <div>
               <Label>Description</Label>
-              <Textarea value={formData.description} onChange={(e) => handleInputChange(e, "description")} placeholder="Enter question description" />
+              <Textarea value={formData.description} onChange={(e) => handleChange(e, "description")} placeholder="Enter question description" />
             </div>
 
             <div>
               <Label>Difficulty</Label>
               <select
                 value={formData.difficulty}
-                onChange={(e) => handleInputChange(e, "difficulty")}
+                onChange={(e) => handleChange(e, "difficulty")}
                 className="w-full p-2 border rounded"
               >
                 <option value='Easy'>Easy</option>
@@ -202,37 +205,37 @@ export const AddQuestionForm = () => {
 
             <div>
               <Label>Category</Label>
-              <Input value={formData.category} onChange={(e) => handleInputChange(e, "category")} placeholder="Enter question category" />
+              <Input value={formData.category} onChange={(e) => handleChange(e, "category")} placeholder="Enter question category" />
             </div>
 
             <div>
               <Label>Time Limit</Label>
-              <Input value={formData.timeLimit} onChange={(e) => handleInputChange(e, "timeLimit")} placeholder="Enter time limit" />
+              <Input value={formData.timeLimit} onChange={(e) => handleChange(e, "timeLimit")} placeholder="Enter time limit" />
             </div>
 
             <div>
               <Label>Acceptance Rate</Label>
-              <Input value={formData.acceptance} onChange={(e) => handleInputChange(e, "acceptance")} placeholder="Enter acceptance rate" />
+              <Input value={formData.acceptance} onChange={(e) => handleChange(e, "acceptance")} placeholder="Enter acceptance rate" />
             </div>
 
             <div>
               <Label>Number of Visible Test cases</Label>
-              <Input value={formData.visibleTestCases} onChange={(e)=>handleInputChange(e,"visibleTestCases")} type="number"></Input>
+              <Input value={formData.visibleTestCases} onChange={(e)=>handleChange(e,"visibleTestCases")} type="number"></Input>
             </div>
             <Label>Test Cases</Label>
             {Object.entries(formData.exampleInput).map(([key, value]) => (
               
         <div key={key} className="">
           <Label className="mb-2 mx-2">{key}</Label>
-         <div className="flex gap-4 mb-2"> <Input
+         <div className="flex gap-4 mb-2"> <Textarea
             placeholder={`Input ${key}`}
             value={value}
-            onChange={(e) => handleChange(Number(key), "exampleInput", e.target.value)}
+            onChange={(e) => handleInputChange(key,e.target.value)}
           />
-          <Input
+          <Textarea
             placeholder={`Output ${key}`}
             value={formData.expectedOutput[key] || ""}
-            onChange={(e) => handleChange(Number(key), "expectedOutput", e.target.value)}
+            onChange={(e) => handleOutputChange(key, e.target.value)}
           /></div>
         </div>
       ))}
@@ -241,7 +244,7 @@ export const AddQuestionForm = () => {
 
             <div>
               <Label>Constraint</Label>
-              <Textarea value={formData.constraintData} onChange={(e) => handleInputChange(e, "constraintData")} placeholder="Enter constraint_data" />
+              <Textarea value={formData.constraintData} onChange={(e) => handleChange(e, "constraintData")} placeholder="Enter constraint_data" />
             </div>
 
             <Button type="submit" className="w-full bg-green-500 text-white hover:bg-green-600" disabled={loading}>

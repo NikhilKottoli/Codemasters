@@ -67,7 +67,7 @@ const getQuestionById = async (req, res) => {
 };
 
 const addQuestion = async (req, res) => {
-  // console.log("addQuestion hit");
+  console.log("addQuestion hit");
   // console.log(req.body);
 
   // Extract and validate data from request body
@@ -80,8 +80,10 @@ const addQuestion = async (req, res) => {
     acceptance,
     exampleInput,
     expectedOutput,
-    constraint_data,
-    visible_test_cases
+    constraintData,
+    visibleTestCases,
+    numTestCases
+
   } = req.body;
 
   if (!title || !description || !difficulty || !category || !exampleInput || !expectedOutput) {
@@ -98,19 +100,20 @@ const addQuestion = async (req, res) => {
           description,
           difficulty,
           category,
-          time_limit: timeLimit,  // Corrected field name
+          time_limit: timeLimit,  
           acceptance,
-          example_input: exampleInput,  // Corrected field name
-          expected_output: expectedOutput,  // Corrected field name
-          constraint_data,
-          visible_test_cases // Ensure this column exists in DB
+          num_test_cases:numTestCases,
+          example_input: exampleInput,  
+          expected_output: expectedOutput,  
+          constraint_data:constraintData,
+          visible_test_cases:visibleTestCases 
         },
       ]);
 
     if (error) {
       throw error;
     }
-
+     console.log("added question")
     return res.status(201).json({ message: "Question added successfully", data });
   } catch (err) {
     console.error("Error adding question:", err);
