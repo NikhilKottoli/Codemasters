@@ -51,26 +51,33 @@ const TaskFetcher: React.FC = () => {
     }
   }, [questionId]);
    
-  const pollTaskResult = async (taskId: string) => {
+  const pollTaskResult = async (taskId: string, actionType: string) => {
     try {
       setSubmission(false);
-      const { data } = await axios.get(`http://localhost:3000/task/${taskId}`);
-      console.log(data);
-      if (data.run.status === "completed") {
-        if(data.run.output != "Wrong Answer")setSubmission(true);
-        setResult(data.run.output || null);
+      let data;
+  
+      if (actionType === "submit") {
+        ({ data } = await axios.get(`http://localhost:3000/task/submit/${taskId}`));
+      } else {
+        ({ data } = await axios.get(`http://localhost:3000/task/${taskId}`));
+      }
+      
+      console.log("Task result data:", data);
+      if (data.status === "completed") {
+        if (data.output !== "Wrong Answer") setSubmission(true);
+        setResult(data.output || data.result);
         setIsPolling(false);
         setIsLoading(false);
-      } else if (data.run.status === "failed") {
+      } else if (data.status === "failed") {
         setError("Task processing failed");
         setIsPolling(false);
         setIsLoading(false);
       } else {
-        setTimeout(() => pollTaskResult(taskId), 500);
+        setTimeout(() => pollTaskResult(taskId, actionType), 500);
       }
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 404) {
-        setTimeout(() => pollTaskResult(taskId), 500);
+        setTimeout(() => pollTaskResult(taskId, actionType), 500);
       } else {
         setError(err.message || "Failed to fetch result");
         setIsPolling(false);
@@ -111,7 +118,7 @@ const TaskFetcher: React.FC = () => {
         { headers: { 'Content-Type': 'application/json' } }
       );
       setIsPolling(true);
-      pollTaskResult(task.taskId);
+      pollTaskResult(task.taskId,actionType);
       
     } catch (error) {
       setError(error instanceof Error ? error.message : `Failed to ${actionType} code`);
