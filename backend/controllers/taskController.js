@@ -90,5 +90,35 @@ const getTaskResultById = async (req, res) => {
   }
 };
 
+const getSubmitbyId = async (req, res) => {
+  const { id } = req.params;
 
-module.exports = { executeTask, getTaskResultById };
+  try {
+    const result = await client.get(`result:${id}`);
+
+    if (!result) {
+      return res.status(404).json({ message: `No result found for task with ID: ${id}` });
+    }
+
+    const parsedResult = JSON.parse(result);
+
+    const formattedResponse = {
+      taskId: id,
+      language: parsedResult.language,
+      version: parsedResult.version,
+      status: parsedResult.run?.status || "unknown",
+      stdout: parsedResult.run?.stdout || "",
+      stderr: parsedResult.run?.stderr || "",
+      compile_output: parsedResult.compile?.stderr || "",
+      result: parsedResult.run?.output || "Unknown"
+    };
+
+    res.status(200).json(formattedResponse);
+  } catch (error) {
+    console.error('Error fetching task result:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
+module.exports = { executeTask, getTaskResultById, getSubmitbyId };
