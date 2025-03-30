@@ -26,6 +26,10 @@ const getTests = async (req, res) => {
       handleApiError(error, res, "Failed to get tests");
     }
   };
+
+const getTestById=async(req,res)=>{
+  
+}
   
   const saveTest = async (req, res) => {
     try {

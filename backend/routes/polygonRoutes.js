@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getProblemInfo, updateProblemInfo, createProblem } = require( '../controllers/polygon/polygonProblemController.js');
-const { verifyCredentials,fetchproblems,checkcreds } = require('../controllers/polygon/polygonController.js');
+const { verifyCredentials,fetchproblems, PolygonQuestion,checkcreds } = require('../controllers/polygon/polygonController.js');
 const {getStatements,saveStatement}=require('../controllers/polygon/polygonStatementController.js')
 const {viewFile,saveFile,getFiles}=require('../controllers/polygon/polygonfileController.js')
 const {getChecker,setChecker} =require('../controllers/polygon/polygonCheckerController.js')
@@ -9,6 +9,9 @@ const {getTests,saveTest}= require('../controllers/polygon/polygonTestCaseContro
 const {getScript,saveScript}=require('../controllers/polygon/polygonScriptController.js')
 const {getSolutions,saveSolution,viewSolution}=require('../controllers/polygon/polygonSolutionController.js')
 router.post('/verify-credentials',checkcreds, verifyCredentials)
+
+// router.post('/add-question/',checkcreds,AddQuestion);
+router.post('/polygon-question',PolygonQuestion)
 
 router.post('/problems',checkcreds,fetchproblems)
 router.post('/create-problem', checkcreds, createProblem);
