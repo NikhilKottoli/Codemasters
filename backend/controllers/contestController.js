@@ -83,4 +83,50 @@ const addQuestions = async (req, res) => {
    }
 }
 
-module.exports = { getContests, addContest, getContest, addQuestions };
+// Register for a contest
+const registerContest = async (req, res) => {
+   const { user_id } = req.body; // Assuming user_id is passed in the request body
+   const { id: contest_id } = req.params; // Contest ID from the route parameter
+
+   if (!user_id || !contest_id) {
+      return res.status(400).json({ message: "User ID and Contest ID are required" });
+   }
+
+   try {
+      const { data, error } = await supabase
+         .from("registrations") // New table to store registrations
+         .insert([{ user_id, contest_id }]);
+
+      if (error) throw error;
+      res.json({ message: "Successfully registered for the contest", data });
+   } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error registering for the contest" });
+   }
+};
+
+const isUserRegistered = async (req, res) => {
+   const { user_id } = req.query; // Assuming user_id is passed as a query parameter
+   const { id: contest_id } = req.params; // Contest ID from the route parameter
+
+   if (!user_id || !contest_id) {
+      return res.status(400).json({ message: "User ID and Contest ID are required" });
+   }
+
+   try {
+      const { data, error } = await supabase
+         .from("registrations")
+         .select("*")
+         .eq("user_id", user_id)
+         .eq("contest_id", contest_id);
+
+      if (error) throw error;
+
+      res.json({ isRegistered: data.length > 0 });
+   } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error checking registration status" });
+   }
+};
+
+module.exports = { isUserRegistered, registerContest, getContests, addContest, getContest, addQuestions };

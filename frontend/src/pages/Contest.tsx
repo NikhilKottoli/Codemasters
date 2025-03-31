@@ -16,6 +16,7 @@ const ContestDetailsPage: React.FC = () => {
   const [contest, setContest] = useState<Contest | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isRegistered, setIsRegistered] = useState<boolean>(false); // New state for registration status
   const { id } = useParams<{ id: string }>();
 
   useEffect(() => {
@@ -24,6 +25,12 @@ const ContestDetailsPage: React.FC = () => {
         setLoading(true);
         const response = await axios.get(`http://localhost:3000/contests/${id}`);
         setContest(response.data[0]); // API returns an array with one contest
+
+        // Check if the user is already registered
+        const registrationResponse = await axios.get(`http://localhost:3000/contests/${id}/is-registered`, {
+          params: { user_id: "5" }, // Replace with the actual user ID from your authentication system
+        });
+        setIsRegistered(registrationResponse.data.isRegistered);
       } catch (err) {
         setError('Failed to load contest details');
         console.error(err);
@@ -136,14 +143,40 @@ const ContestDetailsPage: React.FC = () => {
           >
             Back
           </button>
-          {contestStatus !== 'ended' && (
+          {contestStatus === 'upcoming' && !isRegistered && (
             <button 
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              onClick={async () => {
+                try {
+                  const response = await axios.post(`http://localhost:3000/contests/${contest.id}`, {
+                    user_id: "5", // Replace with the actual user ID from your authentication system
+                  });
+                  if (response.status === 200) {
+                    alert("Successfully registered for the contest!");
+                    setIsRegistered(true); // Update state after successful registration
+                  } else {
+                    alert("Failed to register for the contest.");
+                  }
+                } catch (error) {
+                  console.error("Error registering for the contest:", error);
+                  alert("An error occurred while registering.");
+                }
+              }}
             >
-              {contestStatus === 'upcoming' ? 'Register' : 'Enter Contest'}
+              Register
             </button>
           )}
-          <button className='px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 mx-3' onClick={() => window.location.href = `/contest/editor/${contest.id}`}>
+          {contestStatus === 'active' && (
+            <button 
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
+              Enter Contest
+            </button>
+          )}
+          <button 
+            className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 mx-3"
+            onClick={() => window.location.href = `/contest/editor/${contest.id}`}
+          >
             Edit
           </button>
         </div>
