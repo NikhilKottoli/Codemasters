@@ -23,12 +23,19 @@ const ContestDetailsPage: React.FC = () => {
     const fetchContest = async () => {
       try {
         setLoading(true);
+
+        // Retrieve the user ID from localStorage
+        const userId = localStorage.getItem('token');
+        if (!userId) {
+          throw new Error('User ID not found in localStorage');
+        }
+
         const response = await axios.get(`http://localhost:3000/contests/${id}`);
         setContest(response.data[0]); // API returns an array with one contest
 
         // Check if the user is already registered
         const registrationResponse = await axios.get(`http://localhost:3000/contests/${id}/is-registered`, {
-          params: { user_id: "5" }, // Replace with the actual user ID from your authentication system
+          params: { user_id: userId },
         });
         setIsRegistered(registrationResponse.data.isRegistered);
       } catch (err) {
@@ -43,6 +50,30 @@ const ContestDetailsPage: React.FC = () => {
       fetchContest();
     }
   }, [id]);
+
+  const handleRegister = async () => {
+    try {
+      // Retrieve the user ID from localStorage
+      const userId = localStorage.getItem('token');
+      if (!userId) {
+        alert('User ID not found. Please log in again.');
+        return;
+      }
+
+      const response = await axios.post(`http://localhost:3000/contests/${contest?.id}`, {
+        user_id: userId,
+      });
+      if (response.status === 200) {
+        alert('Successfully registered for the contest!');
+        setIsRegistered(true); // Update state after successful registration
+      } else {
+        alert('Failed to register for the contest.');
+      }
+    } catch (error) {
+      console.error('Error registering for the contest:', error);
+      alert('An error occurred while registering.');
+    }
+  };
 
   // Format date and time for display
   const formatDateTime = (dateTimeString: string) => {
@@ -146,22 +177,7 @@ const ContestDetailsPage: React.FC = () => {
           {contestStatus === 'upcoming' && !isRegistered && (
             <button 
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              onClick={async () => {
-                try {
-                  const response = await axios.post(`http://localhost:3000/contests/${contest.id}`, {
-                    user_id: "5", // Replace with the actual user ID from your authentication system
-                  });
-                  if (response.status === 200) {
-                    alert("Successfully registered for the contest!");
-                    setIsRegistered(true); // Update state after successful registration
-                  } else {
-                    alert("Failed to register for the contest.");
-                  }
-                } catch (error) {
-                  console.error("Error registering for the contest:", error);
-                  alert("An error occurred while registering.");
-                }
-              }}
+              onClick={handleRegister}
             >
               Register
             </button>
