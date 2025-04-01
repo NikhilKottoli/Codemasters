@@ -5,6 +5,7 @@ const taskRoutes = require('./routes/taskRoutes');
 const userRoutes = require('./routes/userRoutes');
 const questionRoutes = require('./routes/questionRoutes');
 const contestRoutes = require('./routes/contestRoutes');
+const polygonRoutes =require('./routes/polygonRoutes')
 
 const io = require('socket.io')(8080, {
   cors: {
@@ -23,16 +24,12 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {console.log('User disconnected');});
 });
 
-
-// const supabase = require('./supabase')
-// const supabase1 = require('./supabase')
-// const { client } = require('./redisClient');
 const cookieParser = require('cookie-parser');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors({ origin: '*' }));
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
@@ -40,6 +37,7 @@ app.use('/task', taskRoutes);
 app.use('/user',userRoutes);
 app.use('/question',questionRoutes)
 app.use('/contests',contestRoutes)
+app.use('/polygon',polygonRoutes)
 
 app.get('/', (req, res) => {
   res.send('Hello World!');

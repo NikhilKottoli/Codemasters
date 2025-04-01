@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Menu, X, ChevronDown, Code, Terminal, Users, BookOpen, Calendar } from 'lucide-react';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
-
+  const [authorized, setAuthorized] = useState(false);
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -12,6 +12,17 @@ const Navbar = () => {
   const toggleDropdown = (dropdown) => {
     setActiveDropdown(activeDropdown === dropdown ? null : dropdown);
   };
+
+    useEffect(() => {
+      const token = localStorage.getItem('token');
+        if (token) {
+          setAuthorized(true);
+        }
+        else{
+          setAuthorized(false);
+        }
+    }
+    , []);
 
   return (
     <nav className="bg-gradient-to-r from-blue-900 to-black shadow-lg">
@@ -35,7 +46,9 @@ const Navbar = () => {
               </a>
 
               <a href="/editor" className="text-white hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium">Real-Time Editor</a>
-
+              {/*  polygon */}
+                 
+              <a href="/polygon" className="text-white hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium">Polygon</a>
               {/* Programs dropdown */}
               <div className="relative">
                 <button 
@@ -71,7 +84,7 @@ const Navbar = () => {
                 {activeDropdown === 'events' && (
                   <div className="absolute z-10 -ml-4 mt-1 transform w-56 rounded-md shadow-lg bg-white">
                     <div className="rounded-md bg-gradient-to-br from-blue-800 to-black shadow-xs py-1">
-                      <a href="#" className="block px-4 py-2 text-sm text-gray-100 hover:bg-blue-700">Hackathons</a>
+                      <a href="/contests" className="block px-4 py-2 text-sm text-gray-100 hover:bg-blue-700">Contests</a>
                       <a href="#" className="block px-4 py-2 text-sm text-gray-100 hover:bg-blue-700">Workshops</a>
                       <a href="#" className="block px-4 py-2 text-sm text-gray-100 hover:bg-blue-700">Webinars</a>
                       <a href="#" className="block px-4 py-2 text-sm text-gray-100 hover:bg-blue-700">Competitions</a>
@@ -79,11 +92,24 @@ const Navbar = () => {
                   </div>
                 )}
               </div>
-
-              <a href="#" className="text-white hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium flex items-center">
+             {authorized&&<a href="/profile" className="text-white hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium flex items-center">
                 <Users className="w-4 h-4 mr-1" />
-                Team
+                Profile
+              </a>}
+
+              {!authorized&&(
+                <>
+                <a href="/" className="text-white hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium flex items-center"> 
+                Sign in
               </a>
+              <a href="/user/signup" className="text-white hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                Signup
+              </a>
+                </>
+              )
+
+              }
+              
             </div>
           </div>
 
@@ -140,7 +166,7 @@ const Navbar = () => {
             </button>
             {activeDropdown === 'mobileEvents' && (
               <div className="pl-4 space-y-1">
-                <a href="#" className="text-gray-300 block px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-800">Hackathons</a>
+                <a href="/contests" className="text-gray-300 block px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-800">Contests</a>
                 <a href="#" className="text-gray-300 block px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-800">Workshops</a>
                 <a href="#" className="text-gray-300 block px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-800">Webinars</a>
                 <a href="#" className="text-gray-300 block px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-800">Competitions</a>

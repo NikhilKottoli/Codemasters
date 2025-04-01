@@ -1,19 +1,18 @@
 const { format } = require('path');
-const {supabase, supabase1} = require('../supabase'); // Import the Supabase client
+const {supabase} = require('../supabase'); // Import the Supabase client
 
-// Get all questions title and some details
 const getAllQuestions = async (req, res) => {
   try {
     // Fetching questions from Supabase
     const { data, error } = await supabase
       .from('questions')  // Table name
-      .select('id, title, difficulty, category'); // Fetch only necessary columns
+      .select('id, title, difficulty, category');
 
     if (error) {
-      throw error;  // Throw error if there is any issue with the query
+      throw error;
     }
 
-    res.json(data); // Respond with the data
+    res.json(data);
   } catch (error) {
     console.error('Error fetching questions:', error.message);
     res.status(500).json({ message: 'Failed to fetch questions', error: error.message });
@@ -67,11 +66,8 @@ const getQuestionById = async (req, res) => {
   }
 };
 
-
-
-
 const addQuestion = async (req, res) => {
-  // console.log("addQuestion hit");
+  console.log("addQuestion hit");
   // console.log(req.body);
 
   // Extract and validate data from request body
@@ -84,8 +80,10 @@ const addQuestion = async (req, res) => {
     acceptance,
     exampleInput,
     expectedOutput,
-    constraint_data,
-    visible_test_cases
+    constraintData,
+    visibleTestCases,
+    numTestCases
+
   } = req.body;
 
   if (!title || !description || !difficulty || !category || !exampleInput || !expectedOutput) {
@@ -102,19 +100,20 @@ const addQuestion = async (req, res) => {
           description,
           difficulty,
           category,
-          time_limit: timeLimit,  // Corrected field name
+          time_limit: timeLimit,  
           acceptance,
-          example_input: exampleInput,  // Corrected field name
-          expected_output: expectedOutput,  // Corrected field name
-          constraint_data,
-          visible_test_cases // Ensure this column exists in DB
+          num_test_cases:numTestCases,
+          example_input: exampleInput,  
+          expected_output: expectedOutput,  
+          constraint_data:constraintData,
+          visible_test_cases:visibleTestCases 
         },
       ]);
 
     if (error) {
       throw error;
     }
-
+     console.log("added question")
     return res.status(201).json({ message: "Question added successfully", data });
   } catch (err) {
     console.error("Error adding question:", err);
@@ -122,5 +121,22 @@ const addQuestion = async (req, res) => {
   }
 };
 
+const getMcqs = async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('mcq')  // Table name
+      .select('*');
 
-module.exports = { addQuestion ,getAllQuestions,getQuestionById };
+    if (error) {
+      throw error;
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching mcqs:', error.message);
+    res.status(500).json({ message: 'Failed to fetch mcqs', error: error.message });
+  }
+}
+
+
+module.exports = { addQuestion ,getAllQuestions,getQuestionById,getMcqs};
