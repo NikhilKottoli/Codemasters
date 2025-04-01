@@ -1,35 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
-// Define types for questions and contests
-interface DSAQuestion {
-  id: number;
-  title: string;
-  // Add other DSA question fields as needed
-}
-
-interface MCQQuestion {
-  id: number;
-  description: string;
-  option1: string;
-  option2: string;
-  option3: string;
-  option4: string;
-  answer: number;
-}
-
-interface Contest {
-  id: number;
-  name: string;
-  desc: string;
-  questions: number[]; // Array of DSA question IDs
-  MCQ: number[]; // Array of MCQ question IDs
-  public: boolean;
-  start_time: string;
-  end_time: string;
-}
-
+import {DSAQuestion,MCQQuestion,Contest} from '../types/contest'
 const ContestQuestionsEditor: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();

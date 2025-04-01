@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 // Define Contest type based on your actual data structure
@@ -18,6 +18,7 @@ const ContestDetailsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isRegistered, setIsRegistered] = useState<boolean>(false); // New state for registration status
   const { id } = useParams<{ id: string }>();
+  const navigate=useNavigate();
 
   useEffect(() => {
     const fetchContest = async () => {
@@ -109,7 +110,7 @@ const ContestDetailsPage: React.FC = () => {
         <p className="mt-2">{error || 'Contest not found'}</p>
         <button 
           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          onClick={() => window.history.back()}
+          onClick={() => navigate('/contests')}
         >
           Go Back
         </button>
@@ -134,6 +135,10 @@ const ContestDetailsPage: React.FC = () => {
             <span className={`px-3 py-1 rounded-full text-sm font-medium 
               ${contest.public ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}`}>
               {contest.public ? 'Public' : 'Private'}
+            </span>
+            <span className={`px-3 py-1 rounded-full text-sm font-medium 
+              ${isRegistered ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+              {isRegistered ? 'Registered' : 'Not Registered'}
             </span>
           </div>
         </div>
@@ -170,7 +175,7 @@ const ContestDetailsPage: React.FC = () => {
         <div className="flex justify-end mt-6">
           <button 
             className="px-4 py-2 bg-gray-200 text-gray-800 rounded mr-2 hover:bg-gray-300"
-            onClick={() => window.history.back()}
+            onClick={() => navigate('/contests')}
           >
             Back
           </button>
@@ -185,13 +190,14 @@ const ContestDetailsPage: React.FC = () => {
           {contestStatus === 'active' && (
             <button 
               className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              onClick={()=>navigate(`/contestPage/${contest.id}`)}
             >
               Enter Contest
             </button>
           )}
           <button 
             className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 mx-3"
-            onClick={() => window.location.href = `/contest/editor/${contest.id}`}
+            onClick={() =>navigate(`/contest/editor/${contest.id}`)}
           >
             Edit
           </button>

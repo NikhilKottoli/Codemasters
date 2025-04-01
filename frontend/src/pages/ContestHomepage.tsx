@@ -1,4 +1,5 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 
@@ -22,6 +23,9 @@ interface FormData {
 }
 
 const Contests: React.FC = () => {
+
+  //to navigate on click
+  const navigate = useNavigate();
   const [contests, setContests] = useState<Contest[]>([]); // State for contests
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -113,7 +117,7 @@ const Contests: React.FC = () => {
           <tbody>
             {ongoingContests.map((contest) => (
               
-              <tr key={contest.id} className="hover:bg-gray-50" onClick={() => window.location.href = `/contests/${contest.id}`}>
+              <tr key={contest.id} className="hover:bg-gray-50" onClick={() => navigate(`/contests/${contest.id}`)}>
                 <td className="border border-gray-300 px-4 py-2">{contest.id}</td>
                 <td className="border border-gray-300 px-4 py-2">{contest.name}</td>
                 <td className="border border-gray-300 px-4 py-2">{contest.desc}</td>
@@ -145,8 +149,9 @@ const Contests: React.FC = () => {
             </tr>
           </thead>
           <tbody>
+          
             {upcomingContests.map((contest) => (
-              <tr key={contest.id} className="hover:bg-gray-50" onClick={() => window.location.href = `/contests/${contest.id}`}>
+              <tr key={contest.id} className="hover:bg-gray-50" onClick={() => navigate(`/contests/${contest.id}`)}>
                 <td className="border border-gray-300 px-4 py-2">{contest.id}</td>
                 <td className="border border-gray-300 px-4 py-2">{contest.name}</td>
                 <td className="border border-gray-300 px-4 py-2">{contest.desc}</td>

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Menu, X, ChevronDown, Code, Terminal, Users, BookOpen, Calendar } from 'lucide-react';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
-
+  const [authorized, setAuthorized] = useState(false);
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -12,6 +12,17 @@ const Navbar = () => {
   const toggleDropdown = (dropdown) => {
     setActiveDropdown(activeDropdown === dropdown ? null : dropdown);
   };
+
+    useEffect(() => {
+      const token = localStorage.getItem('token');
+        if (token) {
+          setAuthorized(true);
+        }
+        else{
+          setAuthorized(false);
+        }
+    }
+    , []);
 
   return (
     <nav className="bg-gradient-to-r from-blue-900 to-black shadow-lg">
@@ -81,11 +92,24 @@ const Navbar = () => {
                   </div>
                 )}
               </div>
-
-              <a href="/profile" className="text-white hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium flex items-center">
+             {authorized&&<a href="/profile" className="text-white hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium flex items-center">
                 <Users className="w-4 h-4 mr-1" />
                 Profile
+              </a>}
+
+              {!authorized&&(
+                <>
+                <a href="/" className="text-white hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium flex items-center"> 
+                Sign in
               </a>
+              <a href="/user/signup" className="text-white hover:bg-blue-800 px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                Signup
+              </a>
+                </>
+              )
+
+              }
+              
             </div>
           </div>
 

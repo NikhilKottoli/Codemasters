@@ -15,6 +15,7 @@ import PolygonProblem from './pages/polygonProblem';
 import CreateProblem from './components/polygonpages/CreateProblem';
 import Profile from './pages/Profile';
 import ContestQuestionsEditor from './pages/ContestQuestionsEditor';
+import ContestPage from './pages/ContestPage';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Routes>
           <Route path="/contests" element={<Contests />} />
           <Route path="/contests/:id" element={<ContestDetailsPage />} />
+          <Route path="/contestPage/:id" element={<ContestPage/>}/>
           <Route path="/" element={<SignIn />} />
           <Route path="/user/signup" element={<SignUp />} />
           <Route path="/questions" element={<Questions />} />
