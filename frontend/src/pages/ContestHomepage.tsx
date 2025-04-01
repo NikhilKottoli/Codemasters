@@ -65,7 +65,7 @@ const Contests: React.FC = () => {
     try {
       const response = await axios.post("http://localhost:3000/contests", formData);
       setSuccess("Contest added successfully!");
-      setContests([...contests, response.data]); // Add the new contest to the list
+      setContests( response.data); // Add the new contest to the list
       setFormData({
         name: "",
         desc: "",

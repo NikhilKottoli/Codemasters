@@ -28,7 +28,7 @@ const addContest = async (req, res) => {
       return res.status(400).json({ message: "Please fill in all fields" });
       }
       try {
-         const { data, error } = await supabase
+         const {error} = await supabase
          .from("contests")
          .insert([
             {
@@ -39,7 +39,9 @@ const addContest = async (req, res) => {
                end_time
             }
          ]);
-            if (error) throw error;
+         if(error) throw error;
+         const {data,new_error} = await supabase.from("contests").select("*");
+            if (new_error) throw new_error;
             res.json(data);
             } catch (error) {
                console.error(error);
