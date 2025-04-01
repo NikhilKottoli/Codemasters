@@ -13,7 +13,7 @@ import { FullQuestionProps } from '@/types/question';
 
 
 const TaskFetcher: React.FC = () => {
-  const { questionId } = useParams<{ questionId: string }>();
+  const { questionId, contestId } = useParams<{ questionId: string, contestId?: string }>();
   const [code, setCode] = useState<string>('// Start coding here...');
   const [language, setLanguage] = useState<string>('js');
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -113,12 +113,13 @@ const TaskFetcher: React.FC = () => {
           action: actionType,
           userId: userid,
           stdin: (currentInput),
-          output: currentOutput
+          output: currentOutput,
+          contestId: contestId
         },
         { headers: { 'Content-Type': 'application/json' } }
       );
       setIsPolling(true);
-      pollTaskResult(task.taskId,actionType);
+      pollTaskResult(task.taskId, actionType);
       
     } catch (error) {
       setError(error instanceof Error ? error.message : `Failed to ${actionType} code`);

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios';
 import { Contest, DSAQuestion, MCQQuestion } from '@/types/contest';
-import Countdown from '@/components/countdown';
+// import {Countdown} from '@/components/countdown';
 const ContestPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -136,7 +136,7 @@ const ContestPage = () => {
           <h1 className="text-3xl font-bold text-gray-800 mb-2">{contest.name}</h1>
           <p className="text-gray-600 mb-4">{contest.desc}</p>
           <div className="flex flex-wrap gap-4 text-sm">
-            <Countdown endTime={contest.end_time}/>
+            {/* <Countdown endTime={contest.end_time}/> */}
             
           </div>
         </div>
@@ -167,7 +167,7 @@ const ContestPage = () => {
                 <div className="mt-2 flex justify-end">
                   <button 
                     className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
-                    onClick={() => navigate(`/question/${question.id}`)}
+                    onClick={() => navigate(`/contest/${id}/solve/${question.id}`)}
                   >
                     Solve
                   </button>

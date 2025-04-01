@@ -4,7 +4,7 @@ const {supabase} = require("../supabase");
 const executeTask = async (req, res) => {
   // console.log('Received submission:', req.body);
 
-  const { language, userId, code, action, stdin,questionId,output } = req.body;
+  const { language, userId, code, action, stdin, questionId, output, contestId } = req.body;
   try {
    
     if (!language || !userId || !code || !action ) {
@@ -41,6 +41,27 @@ const executeTask = async (req, res) => {
     const totalTestCases = Object.keys(data1?.example_input || {}).length;
     req.body.stdin = totalTestCases + "\n" +Object.values(data1?.example_input || {}).join("\n");
     req.body.expectedOutput = Object.values(data1?.expected_output || {}).join("\n");
+
+    // If this is a contest submission, create an entry in contest_submissions table
+    if (contestId) {
+      const { error } = await supabase
+        .from('contest_submissions')
+        .insert([
+          {
+            contest_id: contestId,
+            user_id: userId,
+            question_id: questionId,
+            code: code,
+            language: language,
+            verdict: 'PENDING'
+          }
+        ]);
+      if (error) {
+        console.error('Error creating contest submission:', error);
+        return res.status(500).json({ error: 'Failed to create contest submission' });
+      }
+    }
+
     await Promise.all([
       client.lPush(queue, JSON.stringify(req.body)),
     ]);
@@ -79,10 +100,26 @@ const getTaskResultById = async (req, res) => {
     if (!result) {
       return res.status(404).json({ message: `No result found for task with ID: ${id}` });
     }
-    // console.log("computed result");
-    // console.log(result);
+
     const parsedResult = JSON.parse(result);
-    // console.log(`Result for task ${id}:`, parsedResult);
+
+    // If this is a contest submission, update the verdict in contest_submissions table
+    if (parsedResult.contestId) {
+      const verdict = parsedResult.run?.status === 'Accepted' ? 'AC' : 'WA';
+      const { error } = await supabase
+        .from('contest_submissions')
+        .update({ verdict })
+        .match({ 
+          contest_id: parsedResult.contestId,
+          user_id: parsedResult.userId,
+          question_id: parsedResult.questionId
+        });
+
+      if (error) {
+        console.error('Error updating contest submission verdict:', error);
+      }
+    }
+
     res.status(200).json(parsedResult);
   } catch (error) {
     console.error('Error fetching task result:', error.message);

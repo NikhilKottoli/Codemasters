@@ -31,6 +31,7 @@ function App() {
           <Route path="/questions" element={<Questions />} />
           <Route path="/editor" element={<RealTimeEditor />} />
           <Route path="/solve/:questionId" element={<TaskFetcher />} />
+          <Route path="/contest/:contestId/solve/:questionId" element={<TaskFetcher />} />
           <Route path="/addquestion/:id" element={<AddQuestionForm />} />
           <Route path="/polygon" element={<PolygonHomePage/>} />
           <Route path="/polygon/:problemId" element={<PolygonProblem/>} />
