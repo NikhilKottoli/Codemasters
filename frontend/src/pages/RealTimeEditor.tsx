@@ -56,7 +56,8 @@ export default function RealTimeCodeEditor() {
     return (
         <div className="code-editor-container">
             <Editor
-                height="500px"
+                height="1000px"
+                width={"1000px"}
                 defaultLanguage="javascript"
                 defaultValue="// Start coding here..."
                 theme="vs-dark"

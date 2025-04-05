@@ -1,13 +1,13 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route,Navigate } from 'react-router-dom';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import { Toaster } from '@/components/ui/sonner';
 import Questions from './pages/Questions';
 import TaskFetcher from './pages/TaskFetcher';
 import AddQuestionForm from './pages/AddQuestionForm';
+import { v4 as uuidv4 } from 'uuid';
 import Contests from './pages/ContestHomepage';
 import ContestDetailsPage from './pages/Contest';
-import RealTimeEditor from './pages/RealTimeEditor';
 import Navbar from './components/Navbar';
 import { QuestionProvider } from './contexts/questionContext/questionContext';
 import PolygonHomePage from './pages/polygonHomePage';
@@ -16,6 +16,7 @@ import CreateProblem from './components/polygonpages/CreateProblem';
 import Profile from './pages/Profile';
 import ContestQuestionsEditor from './pages/ContestQuestionsEditor';
 import ContestPage from './pages/ContestPage';
+import RealTimeEditorWithSidebar from './pages/RealTimeEditorQ';
 
 function App() {
   return (
@@ -30,7 +31,8 @@ function App() {
           <Route path="/user/signup" element={<SignUp />} />
           <Route path="/user/signin" element={<SignIn />} />
           <Route path="/questions" element={<Questions />} />
-          <Route path="/editor" element={<RealTimeEditor />} />
+          <Route path="/editor"  element={<Navigate to={`/editor/${uuidv4()}`} replace />}/>
+          <Route path="/editor/:id" element={<RealTimeEditorWithSidebar />} />
           <Route path="/solve/:questionId" element={<TaskFetcher />} />
           <Route path="/contest/:contestId/solve/:questionId" element={<TaskFetcher />} />
           <Route path="/addquestion/:id" element={<AddQuestionForm />} />
