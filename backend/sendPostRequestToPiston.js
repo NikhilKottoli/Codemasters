@@ -35,6 +35,15 @@ class TaskProcessor {
       stdin: task.stdin || ''
     });
     response.data.run.status = "completed";
+    if(task.contestId) {
+      response.data = { ...response.data, contestId: task.contestId };
+    }
+    if(task.questionId) {
+      response.data = { ...response.data, questionId: task.questionId };
+    }
+    if(task.userId) {
+      response.data = { ...response.data, userId: task.userId };
+    }
     return response.data;
     } catch (error) {
       console.error('Execution error:', error.message);
@@ -57,7 +66,8 @@ class TaskProcessor {
             ...result.run,
             output: temp === expectedOutput ? "Accepted" : "Wrong Answer",
             status:"completed"
-          }
+          },
+
         };
 
         // Store result in Redis and manage queues

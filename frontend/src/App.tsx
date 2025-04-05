@@ -28,6 +28,7 @@ function App() {
           <Route path="/contestPage/:id" element={<ContestPage/>}/>
           <Route path="/" element={<SignIn />} />
           <Route path="/user/signup" element={<SignUp />} />
+          <Route path="/user/signin" element={<SignIn />} />
           <Route path="/questions" element={<Questions />} />
           <Route path="/editor" element={<RealTimeEditor />} />
           <Route path="/solve/:questionId" element={<TaskFetcher />} />
