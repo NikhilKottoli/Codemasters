@@ -24,6 +24,7 @@ const TaskFetcher: React.FC = () => {
   const [currentOutput, setCurrentOutput] = useState<string | null>(null);
   const userid = localStorage.getItem('token');
   const [submission, setSubmission] = useState(false);
+  const [action,setAction] = useState("run");
 
   // Fetch question details from the API using questionId
   const [question, setQuestion] = useState<FullQuestionProps | null>(null);
@@ -64,7 +65,8 @@ const TaskFetcher: React.FC = () => {
       
       console.log("Task result data:", data);
       if (data.status === "completed") {
-        if (data.output !== "Wrong Answer") setSubmission(true);
+        if (data.result !== "Wrong Answer") setSubmission(true);
+        if(action === "run") setSubmission(true);
         setResult(data.output || data.result);
         setIsPolling(false);
         setIsLoading(false);
@@ -178,10 +180,10 @@ const TaskFetcher: React.FC = () => {
             )}
             {result && (
               <div
-                className={`mt-4 p-6 border rounded-lg shadow ${submission || (normalizeString(result) === normalizeString(currentOutput)) ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`}
+                className={`mt-4 p-6 border rounded-lg shadow bg-white border-gray-500 '}`}
               >
                 <h2
-                  className={`font-bold text-lg ${(submission || normalizeString(result) === normalizeString(currentOutput)) ? 'text-green-800' : 'text-red-800'} mb-2`}
+                  className={`font-bold text-lg ${(submission || normalizeString(result) === normalizeString(currentOutput)) ? 'text-green-800' : 'text-red-800'} mb-2 ${action == 'run' ? 'hidden' : ''}`}
                 >
                   {submission || (normalizeString(result) === normalizeString(currentOutput)) ? 'Correct' : 'Wrong'}
                 </h2>
