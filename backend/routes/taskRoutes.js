@@ -7,5 +7,6 @@ const router = express.Router();
 router.post('/', executeTask);
 router.get('/:id', getTaskResultById);
 router.get('/submit/:id', getSubmitbyId);
+// router.get('/contests/:id/ranklist', getFinalRanklist);
 
 module.exports = router;
