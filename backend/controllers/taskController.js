@@ -2,7 +2,7 @@ const { client } = require('../redisClient');
 const {supabase} = require("../supabase");
 
 const executeTask = async (req, res) => {
-  // console.log('Received submission:', req.body);
+  console.log('Received submission:', req.body);
 
   const { language,taskId, userId, code, action, stdin, questionId, output, contestId } = req.body;
   try {
