@@ -4,6 +4,7 @@ import axios from 'axios';
 
 interface RankEntry {
   user_id: string;
+  username: string;
   score: number;
   rank: number;
 }
@@ -49,18 +50,18 @@ const RanklistPage: React.FC = () => {
         <thead>
           <tr>
             <th className="border border-gray-300 px-4 py-2">Rank</th>
-            <th className="border border-gray-300 px-4 py-2">User ID</th>
+            <th className="border border-gray-300 px-4 py-2">Name</th>
             <th className="border border-gray-300 px-4 py-2">Score</th>
           </tr>
         </thead>
         <tbody>
-          {/* {ranklist.map((entry) => (
+          {ranklist.map((entry) => (
             <tr key={entry.user_id}>
               <td className="border border-gray-300 px-4 py-2 text-center">{entry.rank}</td>
-              <td className="border border-gray-300 px-4 py-2 text-center">{entry.user_id}</td>
+              <td className="border border-gray-300 px-4 py-2 text-center">{entry.username}</td>
               <td className="border border-gray-300 px-4 py-2 text-center">{entry.score}</td>
             </tr>
-          ))} */}
+          ))}
         </tbody>
       </table>
     </div>
