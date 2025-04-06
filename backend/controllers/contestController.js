@@ -131,4 +131,34 @@ const isUserRegistered = async (req, res) => {
    }
 };
 
-module.exports = { isUserRegistered, registerContest, getContests, addContest, getContest, addQuestions };
+const getFinalRanklist = async (req, res) => {
+   const { id: contest_id } = req.params;
+   if(!contest_id) {
+      return res.status(400).json({ message: "Contest ID is required" });
+   }
+   try {
+      const { data, error } = await supabase
+         .from("contest_submissions")
+         .select("user_id, verdict")
+         .eq("contest_id", contest_id);
+
+      if (error) throw error;
+      // res.json({data});
+      // Process the data to create the final ranklist
+      const ranklist = data.reduce((acc, submission) => {
+         if (!acc[submission.user_id]) {
+            acc[submission.user_id] = { score: 0, verdicts: [] };
+         }
+         acc[submission.user_id].verdicts.push(submission.verdict);
+         console.log(submission);
+         acc[submission.user_id].score += submission.verdict === "AC" ? 2 : -1;
+         return acc;
+      }, {});
+
+      res.json({ranklist});
+   } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error fetching final ranklist" });
+   }
+}
+module.exports = { getFinalRanklist, isUserRegistered, registerContest, getContests, addContest, getContest, addQuestions };

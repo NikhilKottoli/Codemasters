@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { isUserRegistered, registerContest, getContests, addContest, getContest,addQuestions } = require('../controllers/contestController');
+const { getFinalRanklist, isUserRegistered, registerContest, getContests, addContest, getContest,addQuestions } = require('../controllers/contestController');
 
 // Get all contests
 router.get('/', getContests);
@@ -14,5 +14,5 @@ router.post('/', addContest);
 router.put('/:id', addQuestions);
 router.post("/:id", registerContest); //contest_reg
 router.get("/:id/is-registered", isUserRegistered);
-
+router.get("/:id/ranklist", getFinalRanklist); //ranklist
 module.exports = router;// Export the router to use it in the main application
