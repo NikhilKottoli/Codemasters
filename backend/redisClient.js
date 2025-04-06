@@ -1,3 +1,4 @@
+// redisClient.js
 const { createClient } = require('redis');
 
 const client = createClient({
@@ -9,18 +10,15 @@ const client = createClient({
   },
 });
 
-client.on('error', (err) => console.log('Redis Client Error', err));
+client.on('error', (err) => console.error('Redis Client Error:', err));
 
-async function connectAndTest() {
+(async () => {
   try {
     await client.connect();
-
-    await client.set('foo', 'bar');
-    const result = await client.get('foo');
-    console.log(result == 'bar' ? 'Connected To Redis!' : 'Test failed!');
+    console.log('✅ Connected to Redis');
   } catch (err) {
-    console.error('Error:', err);
+    console.error('❌ Redis connection failed:', err);
   }
-}
+})();
 
-connectAndTest();
+module.exports = { client }; // ✅ named export
