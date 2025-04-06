@@ -2,6 +2,7 @@ import React,{useEffect,useState} from "react";
 import { Button } from "@/components/ui/button"
 import { fetchendpoint } from "@/services/polygon";
 import { Input } from "@/components/ui/input"
+import config from "@/config";
 
 export const ProblemInfoTab: React.FC<{  apiKey: string, secret: string, problemId: string }> = ({ apiKey, secret, problemId }) => {
     const [problemInfo, setProblemInfo] = useState<any>();
