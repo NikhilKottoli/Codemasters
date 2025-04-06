@@ -137,6 +137,7 @@ const TaskFetcher: React.FC = () => {
       <div className="container mx-auto p-4">
         <div className="flex gap-10">
           <div className="w-[30%]">
+            
             <QuestionCard
               title={question.title}
               description={question.description}
@@ -151,8 +152,7 @@ const TaskFetcher: React.FC = () => {
               currentInput={currentInput}
               setcurrentInput={setCurrentInput}
               currentOutput={currentOutput}
-              setcurrentOutput={setCurrentOutput}
-            />
+              setcurrentOutput={setCurrentOutput} selected_input={''} selected_output={''}            />
           </div>
           <div className="w-[70%]">
             <Editor
