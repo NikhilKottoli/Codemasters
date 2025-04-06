@@ -41,7 +41,7 @@ const Contests: React.FC = () => {
   useEffect(() => {
     const fetchContests = async () => {
       try {
-        const response = await axios.get<Contest[]>(`http://${config.HOST}/contests`);
+        const response = await axios.get<Contest[]>(`${config.HOST}/contests`);
         setContests(response.data);
       } catch (err) {
         console.error("Error fetching contests:", err);
@@ -67,7 +67,7 @@ const Contests: React.FC = () => {
     setSuccess("");
 
     try {
-      const response = await axios.post(`http://${config.HOST}/contests`, formData);
+      const response = await axios.post(`${config.HOST}/contests`, formData);
       setSuccess("Contest added successfully!");
       setContests( response.data); // Add the new contest to the list
       setFormData({

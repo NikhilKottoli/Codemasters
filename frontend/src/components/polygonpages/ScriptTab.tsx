@@ -33,7 +33,7 @@ export const ScriptTab: React.FC<{apiKey: string, secret: string, problemId: str
         setMessage(null);
         
         try {
-            const response = await fetch(`http://${config.HOST}/polygon/save-script`, {
+            const response = await fetch(`${config.HOST}/polygon/save-script`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

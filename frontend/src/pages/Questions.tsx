@@ -14,7 +14,7 @@ const QuestionsList = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    axios.get(`http://${config.HOST}/question/`)
+    axios.get(`${config.HOST}/question/`)
       .then(response => {
         setQuestions(response.data);
         setLoading(false);

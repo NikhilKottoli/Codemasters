@@ -41,7 +41,7 @@ export const SolutionsTab: React.FC<{  apiKey: string, secret: string, problemId
         setLoading(true);
         
         try {
-            const response = await fetch(`http://${config.HOST}/polygon/view-solution`, {
+            const response = await fetch(`${config.HOST}/polygon/view-solution`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -68,7 +68,7 @@ export const SolutionsTab: React.FC<{  apiKey: string, secret: string, problemId
         setMessage(null);
         
         try {
-            const response = await fetch(`http://${config.HOST}/polygon/save-solution`, {
+            const response = await fetch(`${config.HOST}/polygon/save-solution`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

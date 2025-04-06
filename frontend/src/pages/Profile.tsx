@@ -22,7 +22,7 @@ function Profile() {
           throw new Error('User not authenticated');
         }
         
-        const response = await fetch(`http://${config.HOST}/user/userData/${encodeURIComponent(id)}`);
+        const response = await fetch(`${config.HOST}/user/userData/${encodeURIComponent(id)}`);
         if (!response.ok) {
           throw new Error('Failed to fetch user data');
         }

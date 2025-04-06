@@ -42,7 +42,7 @@ export const CheckerTab: React.FC<{  apiKey: string, secret: string, problemId: 
         
         setLoading(true);
         try {
-            const response = await fetch(`http://${config.HOST}/polygon/view-file`, {
+            const response = await fetch(`${config.HOST}/polygon/view-file`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -80,7 +80,7 @@ export const CheckerTab: React.FC<{  apiKey: string, secret: string, problemId: 
         
         try {
             // First save the checker file
-            await fetch(`http://${config.HOST}/polygon/save-file`, {
+            await fetch(`${config.HOST}/polygon/save-file`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -95,7 +95,7 @@ export const CheckerTab: React.FC<{  apiKey: string, secret: string, problemId: 
             });
             
             // Then set it as the checker
-            await fetch(`http://${config.HOST}/polygon/set-checker`, {
+            await fetch(`${config.HOST}/polygon/set-checker`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

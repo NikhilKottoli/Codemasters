@@ -27,7 +27,7 @@ const ContestPage = () => {
   useEffect(() => {
     const fetchContest = async () => {
       try {
-        const response = await axios.get(`http://${config.HOST}/contests/${id}`);
+        const response = await axios.get(`${config.HOST}/contests/${id}`);
         console.log(response);
         const contestData = response.data[0];
         setContest(contestData);
@@ -48,7 +48,7 @@ const ContestPage = () => {
         setIsLoading(true);
         
         // Fetch DSA questions
-        const dsaResponse = await axios.get(`http://${config.HOST}/question/`);
+        const dsaResponse = await axios.get(`${config.HOST}/question/`);
         console.log("dsa questions fetch", dsaResponse.data);
         
         // Only filter if contest and contest.questions exist
@@ -57,7 +57,7 @@ const ContestPage = () => {
         }
         
         // Fetch MCQ questions
-        const mcqResponse = await axios.get(`http://${config.HOST}/question/mcqs`);
+        const mcqResponse = await axios.get(`${config.HOST}/question/mcqs`);
         
         // Only filter if contest and contest.MCQ exist
         if (contest && contest.MCQ) {
