@@ -1,9 +1,19 @@
+require('dotenv').config();
 const Redis = require('ioredis');
 const axios = require('axios');
 const runtime_url = process.env.RUNTIME_URL || 'https://emkc.org/api/v2/piston/execute';
+
 class TaskProcessor {
-  constructor(redisUrl = 'redis://localhost:6379') {
-    this.redis = new Redis(redisUrl);
+  constructor(
+    redisUrl = process.env.REDIS_HOST,
+    redisPassword = process.env.REDIS_PASSWORD
+  ) {
+    this.redis = new Redis({
+      host: redisUrl,
+      port: 12484,
+      password: redisPassword,
+    });
+
     this.isRunning = true;
     this.queues = {
       run: 'runQueue',
