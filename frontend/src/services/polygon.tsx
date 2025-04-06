@@ -1,3 +1,5 @@
+import config from '@/config';
+
 export const fetchendpoint = async (apiKey: string, secret: string, problemId:string, methodName:string) => {
     try {
 

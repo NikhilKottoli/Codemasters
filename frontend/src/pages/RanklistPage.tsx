@@ -18,6 +18,9 @@ const RanklistPage: React.FC = () => {
   useEffect(() => {
     const fetchRanklist = async () => {
       try {
+        if(ranklist.length >= 0){
+          console.log("Ranklist already fetched");
+        }
         const response = await axios.get(`http://localhost:3000/contests/${id}/ranklist`);
         setRanklist(response.data.ranklist);
         console.log(response.data.ranklist);
