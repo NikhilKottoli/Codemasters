@@ -95,7 +95,7 @@ export const StatementsTab: React.FC<{  apiKey: string, secret: string, problemI
         setMessage(null);
         
         try {
-            const response = await fetch(`http://${config.HOST}/polygon/save-statement`, {
+            const response = await fetch(`${config.HOST}/polygon/save-statement`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

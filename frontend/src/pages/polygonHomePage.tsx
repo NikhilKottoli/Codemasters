@@ -76,7 +76,7 @@ const PolygonHomePage = () => {
            setApiKey(data?.apiKey);
         const fetchProblems = async (apiKey: string, secret: string) => {
             try {
-                const response = await fetch(`http://${config.HOST}/polygon/problems`, {
+                const response = await fetch(`${config.HOST}/polygon/problems`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ apiKey, secret })

@@ -2,7 +2,7 @@ export const fetchendpoint = async (apiKey: string, secret: string, problemId:st
     try {
 
         console.log("fetch endpoint",problemId)
-        const response = await fetch(`http://${config.HOST}/polygon/${methodName}`, {
+        const response = await fetch(`${config.HOST}/polygon/${methodName}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ apiKey, secret, problemId })

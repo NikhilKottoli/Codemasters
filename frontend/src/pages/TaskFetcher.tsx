@@ -32,7 +32,7 @@ const TaskFetcher: React.FC = () => {
 
   useEffect(() => {
     if (questionId) {
-      axios.get(`http://${config.HOST}/question/${questionId}`)
+      axios.get(`${config.HOST}/question/${questionId}`)
         .then(response => {
           for(let i =1;i<=response.data.visible_test_cases;i++){
             response.data.example_input[i] = "1\n" + response.data.example_input[i];
@@ -54,9 +54,9 @@ const TaskFetcher: React.FC = () => {
       let data;
   
       if (actionType === "submit") {
-        ({ data } = await axios.get(`http://${config.HOST}/task/submit/${taskId}`));
+        ({ data } = await axios.get(`${config.HOST}/task/submit/${taskId}`));
       } else {
-        ({ data } = await axios.get(`http://${config.HOST}/task/${taskId}`));
+        ({ data } = await axios.get(`${config.HOST}/task/${taskId}`));
       }
       
       console.log("Task result data:", data);
@@ -105,7 +105,7 @@ const TaskFetcher: React.FC = () => {
       });
 
       await axios.post(
-        `http://${config.HOST}/task`,
+        `${config.HOST}/task`,
         {
           ...task,
           action: actionType,

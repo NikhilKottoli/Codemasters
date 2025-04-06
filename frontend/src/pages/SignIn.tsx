@@ -30,7 +30,7 @@ export default function SignIn() {
       const email = formData.get('email') as string;
       const password = formData.get('password') as string;
 
-      const response = await fetch(`http://${config.HOST}/user/signin`, {
+      const response = await fetch(`${config.HOST}/user/signin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

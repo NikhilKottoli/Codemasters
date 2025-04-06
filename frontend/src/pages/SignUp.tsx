@@ -24,7 +24,7 @@ export default function SignUp() {
     };
 
     try {
-      const response = await fetch(`http://${config.HOST}/user/signup`, {
+      const response = await fetch(`${config.HOST}/user/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -26,7 +26,7 @@ const ContestQuestionsEditor: React.FC = () => {
   useEffect(() => {
     const fetchContest = async () => {
       try {
-        const response = await axios.get(`http://${config.HOST}/contests/${id}`);
+        const response = await axios.get(`${config.HOST}/contests/${id}`);
         console.log(response);
         const contestData = response.data[0];
         setContest(contestData);
@@ -65,11 +65,11 @@ const ContestQuestionsEditor: React.FC = () => {
         setIsLoading(true);
         
         // Fetch DSA questions
-        const dsaResponse = await axios.get(`http://${config.HOST}/question/`);
+        const dsaResponse = await axios.get(`${config.HOST}/question/`);
         setDsaQuestions(dsaResponse.data);
         
         // Fetch MCQ questions
-        const mcqResponse = await axios.get(`http://${config.HOST}/question/mcqs`);
+        const mcqResponse = await axios.get(`${config.HOST}/question/mcqs`);
         setMcqQuestions(mcqResponse.data);
       } catch (err) {
         setError('Failed to load questions');
@@ -108,7 +108,7 @@ const ContestQuestionsEditor: React.FC = () => {
       setIsSaving(true);
       setSaveMessage(null);
       
-      await axios.put(`http://${config.HOST}/contests/${id}`, {
+      await axios.put(`${config.HOST}/contests/${id}`, {
         ...contest,
         questions: JSON.stringify(selectedDsaIds),
         MCQ: JSON.stringify(selectedMcqIds)

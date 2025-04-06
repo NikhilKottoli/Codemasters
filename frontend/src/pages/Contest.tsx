@@ -31,11 +31,11 @@ const ContestDetailsPage: React.FC = () => {
           throw new Error('User ID not found in localStorage');
         }
 
-        const response = await axios.get(`http://${config.HOST}/contests/${id}`);
+        const response = await axios.get(`${config.HOST}/contests/${id}`);
         setContest(response.data[0]); // API returns an array with one contest
 
         // Check if the user is already registered
-        const registrationResponse = await axios.get(`http://${config.HOST}/contests/${id}/is-registered`, {
+        const registrationResponse = await axios.get(`${config.HOST}/contests/${id}/is-registered`, {
           params: { user_id: userId },
         });
         setIsRegistered(registrationResponse.data.isRegistered);
@@ -61,7 +61,7 @@ const ContestDetailsPage: React.FC = () => {
         return;
       }
 
-      const response = await axios.post(`http://${config.HOST}/contests/${contest?.id}`, {
+      const response = await axios.post(`${config.HOST}/contests/${contest?.id}`, {
         user_id: userId,
       });
       if (response.status === 200) {
@@ -74,6 +74,10 @@ const ContestDetailsPage: React.FC = () => {
       console.error('Error registering for the contest:', error);
       alert('An error occurred while registering.');
     }
+  };
+
+  const handleViewRanklist = () => {
+    window.location.href = `/contest/${contest?.id}/ranklist`;
   };
 
   // Format date and time for display
@@ -193,6 +197,14 @@ const ContestDetailsPage: React.FC = () => {
               onClick={()=>navigate(`/contestPage/${contest.id}`)}
             >
               Enter Contest
+            </button>
+          )}
+          {contestStatus === 'active' && (
+            <button
+              className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+              onClick={handleViewRanklist}
+            >
+              View Ranklist
             </button>
           )}
           <button 

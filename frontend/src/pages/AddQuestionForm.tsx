@@ -130,7 +130,7 @@ export const AddQuestionForm = () => {
     setSuccess(false);
 
     try {
-      const response = await fetch(`http://${config.HOST}/question/`, {
+      const response = await fetch(`${config.HOST}/question/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

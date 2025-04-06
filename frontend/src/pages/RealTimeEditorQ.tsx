@@ -11,14 +11,14 @@ const RealTimeEditorWithSidebar = () => {
   const [currentOutput, setcurrentOutput] = useState<string | null>(null);
 
   useEffect(() => {
-    axios.get(`http://${config.HOST}/question`)
+    axios.get(`${config.HOST}/question`)
       .then(res => setQuestions(res.data))
       .catch(err => console.error("Failed to fetch questions", err));
   }, []);
 
   const handleQuestionClick = async (id: string) => {
     try {
-      const res = await axios.get(`http://${config.HOST}/question/${id}`);
+      const res = await axios.get(`${config.HOST}/question/${id}`);
       setSelectedQuestion(res.data);
       setcurrentInput(null);
       setcurrentOutput(null);

@@ -52,7 +52,7 @@ export const ProblemInfoTab: React.FC<{  apiKey: string, secret: string, problem
         setMessage(null);
          console.log("Form Data:",formData);    
         try {
-            const response = await fetch(`http://${config.HOST}/polygon/update-problem-info`, {
+            const response = await fetch(`${config.HOST}/polygon/update-problem-info`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

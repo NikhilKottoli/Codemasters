@@ -27,7 +27,7 @@ export const CodeSubmissionForm: React.FC = () => {
     setResponseMessage(null);
 
     try {
-      const response = await fetch(`http://${config.HOST}/api/test`, {
+      const response = await fetch(`${config.HOST}/api/test`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
