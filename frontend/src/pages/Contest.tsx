@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-
+import config from '@/config';
 // Define Contest type based on your actual data structure
 interface Contest {
   id: number;
@@ -31,11 +31,11 @@ const ContestDetailsPage: React.FC = () => {
           throw new Error('User ID not found in localStorage');
         }
 
-        const response = await axios.get(`http://localhost:3000/contests/${id}`);
+        const response = await axios.get(`http://${config.HOST}/contests/${id}`);
         setContest(response.data[0]); // API returns an array with one contest
 
         // Check if the user is already registered
-        const registrationResponse = await axios.get(`http://localhost:3000/contests/${id}/is-registered`, {
+        const registrationResponse = await axios.get(`http://${config.HOST}/contests/${id}/is-registered`, {
           params: { user_id: userId },
         });
         setIsRegistered(registrationResponse.data.isRegistered);
@@ -61,7 +61,7 @@ const ContestDetailsPage: React.FC = () => {
         return;
       }
 
-      const response = await axios.post(`http://localhost:3000/contests/${contest?.id}`, {
+      const response = await axios.post(`http://${config.HOST}/contests/${contest?.id}`, {
         user_id: userId,
       });
       if (response.status === 200) {

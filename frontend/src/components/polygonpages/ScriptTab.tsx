@@ -2,6 +2,8 @@ import React,{useState,useEffect} from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchendpoint } from "@/services/polygon";
+import config from "@/config";
+
 export const ScriptTab: React.FC<{apiKey: string, secret: string, problemId: string }> = ({apiKey, secret, problemId }) => {
     const [script, setScript] = useState<string | null>(null);
     const [scriptCode, setScriptCode] = useState(script || '');
@@ -31,7 +33,7 @@ export const ScriptTab: React.FC<{apiKey: string, secret: string, problemId: str
         setMessage(null);
         
         try {
-            const response = await fetch('http://localhost:3000/polygon/save-script', {
+            const response = await fetch(`http://${config.HOST}/polygon/save-script`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

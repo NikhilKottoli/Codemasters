@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { UserCircle, LogOut, Mail, Briefcase } from 'lucide-react';
+import config from "@/config";
 
 interface UserData {
     username: string;
@@ -21,7 +22,7 @@ function Profile() {
           throw new Error('User not authenticated');
         }
         
-        const response = await fetch(`http://localhost:3000/user/userData/${encodeURIComponent(id)}`);
+        const response = await fetch(`http://${config.HOST}/user/userData/${encodeURIComponent(id)}`);
         if (!response.ok) {
           throw new Error('Failed to fetch user data');
         }

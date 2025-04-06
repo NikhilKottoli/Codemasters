@@ -62,7 +62,7 @@ export const FilesTab: React.FC<{ apiKey: string, secret: string, problemId: str
                 params.sourceType = sourceType;
             }
             
-            const response = await fetch('http://localhost:3000/polygon/save-file', {
+            const response = await fetch('http://${.config.HOST}/polygon/save-file', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(params)
@@ -89,7 +89,7 @@ export const FilesTab: React.FC<{ apiKey: string, secret: string, problemId: str
         setLoading(true);
         
         try {
-            const response = await fetch('http://localhost:3000/polygon/view-file', {
+            const response = await fetch('http://${.config.HOST}/polygon/view-file', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

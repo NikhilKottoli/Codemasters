@@ -3,6 +3,8 @@ import { fetchendpoint } from "@/services/polygon";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import config from "@/config";
+
 export const StatementsTab: React.FC<{  apiKey: string, secret: string, problemId: string }> = ({apiKey, secret, problemId }) => {
     const [statements, setStatements] = useState<any>([]);
     const [selectedLanguage, setSelectedLanguage] = useState('');
@@ -93,7 +95,7 @@ export const StatementsTab: React.FC<{  apiKey: string, secret: string, problemI
         setMessage(null);
         
         try {
-            const response = await fetch('http://localhost:3000/polygon/save-statement', {
+            const response = await fetch(`http://${config.HOST}/polygon/save-statement`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

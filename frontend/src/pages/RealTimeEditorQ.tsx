@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import RealTimeCodeEditor from "./RealTimeEditor";
 import QuestionCard from "./QuestionCard";
 import axios from "axios";
+import config from "@/config";
 
 const RealTimeEditorWithSidebar = () => {
   const [questions, setQuestions] = useState([]);
@@ -10,14 +11,14 @@ const RealTimeEditorWithSidebar = () => {
   const [currentOutput, setcurrentOutput] = useState<string | null>(null);
 
   useEffect(() => {
-    axios.get("http://localhost:3000/question")
+    axios.get(`http://${config.HOST}/question`)
       .then(res => setQuestions(res.data))
       .catch(err => console.error("Failed to fetch questions", err));
   }, []);
 
   const handleQuestionClick = async (id: string) => {
     try {
-      const res = await axios.get(`http://localhost:3000/question/${id}`);
+      const res = await axios.get(`http://${config.HOST}/question/${id}`);
       setSelectedQuestion(res.data);
       setcurrentInput(null);
       setcurrentOutput(null);

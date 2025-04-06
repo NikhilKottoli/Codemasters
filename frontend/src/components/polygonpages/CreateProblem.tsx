@@ -28,7 +28,7 @@ const [name, setName] = useState('');
         }, [])
     const handleCreateProblem = async () => {
         try {
-            const response = await fetch('http://localhost:3000/polygon/create-problem', {
+            const response = await fetch('http://${.config.HOST}/polygon/create-problem', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

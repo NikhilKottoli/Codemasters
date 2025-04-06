@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { Link,useNavigate } from "react-router-dom";
 import { PolygonProblemType } from "../types/polygon";
 import { fetchendpoint,loadCredentials } from "@/services/polygon";
-import { set } from "react-hook-form";
+import config from "@/config";
 
 interface ProblemTileProps {
     problem: PolygonProblemType;
@@ -76,7 +76,7 @@ const PolygonHomePage = () => {
            setApiKey(data?.apiKey);
         const fetchProblems = async (apiKey: string, secret: string) => {
             try {
-                const response = await fetch('http://localhost:3000/polygon/problems', {
+                const response = await fetch('http://${.config.HOST}/polygon/problems', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ apiKey, secret })

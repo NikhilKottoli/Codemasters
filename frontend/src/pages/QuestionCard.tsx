@@ -5,7 +5,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { FullQuestionProps, getDifficultyColor } from '@/types/question';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuestion, useSetQuestion } from '@/contexts/questionContext/useQuestion';
-
 // Properly type the component props
 interface QuestionCardProps extends FullQuestionProps {
   currentInput: string | null;

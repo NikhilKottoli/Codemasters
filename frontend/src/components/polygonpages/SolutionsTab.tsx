@@ -3,6 +3,8 @@ import {fetchendpoint} from "@/services/polygon";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
+import config from "@/config";
+
 export const SolutionsTab: React.FC<{  apiKey: string, secret: string, problemId: string }> = ({  apiKey, secret, problemId }) => {
     const [solutions, setSolutions] = useState<any[]>([]);
     const [newSolution, setNewSolution] = useState({
@@ -39,7 +41,7 @@ export const SolutionsTab: React.FC<{  apiKey: string, secret: string, problemId
         setLoading(true);
         
         try {
-            const response = await fetch('http://localhost:3000/polygon/view-solution', {
+            const response = await fetch(`http://${config.HOST}/polygon/view-solution`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -66,7 +68,7 @@ export const SolutionsTab: React.FC<{  apiKey: string, secret: string, problemId
         setMessage(null);
         
         try {
-            const response = await fetch('http://localhost:3000/polygon/save-solution', {
+            const response = await fetch(`http://${config.HOST}/polygon/save-solution`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

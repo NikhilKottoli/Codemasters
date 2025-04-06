@@ -4,7 +4,7 @@ import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { QuestionCardProps,getDifficultyColor } from "@/types/question";
-
+import config from "@/config";
 
 
 
@@ -14,7 +14,7 @@ const QuestionsList = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    axios.get("http://localhost:3000/question/")
+    axios.get(`http://${config.HOST}/question/`)
       .then(response => {
         setQuestions(response.data);
         setLoading(false);

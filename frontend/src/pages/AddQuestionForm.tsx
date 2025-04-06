@@ -6,8 +6,7 @@ import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useParams } from "react-router-dom";
 import { fetchendpoint, loadCredentials } from "@/services/polygon";
-import { set } from "react-hook-form";
-import { fork } from "child_process";
+import config from "@/config";
 
 interface QuestionFormData {
   title: string;
@@ -131,7 +130,7 @@ export const AddQuestionForm = () => {
     setSuccess(false);
 
     try {
-      const response = await fetch("http://localhost:3000/question/", {
+      const response = await fetch(`http://${config.HOST}/question/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
