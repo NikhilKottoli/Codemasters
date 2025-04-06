@@ -14,7 +14,8 @@ export default function RealTimeCodeEditor() {
 
     // Initialize socket connection
     useEffect(() => {
-        const s = io(`http://${config.SOCKET_URL}`);
+        const socketUrl = config.SOCKET_URL;
+        const s = io(socketUrl);
         setSocket(s);
 
         return () => {
@@ -36,12 +37,14 @@ export default function RealTimeCodeEditor() {
             
             const content = editorRef.current ? editorRef.current.getValue() : "";
             socket.emit("send-changes", content);
+            console.log("Content sent to server:", content);
         };
     
         const handleContentChange = (content :any) => {
             isEditing.current = true;
             if (editorRef.current) {
                 editorRef.current.setValue(content);
+                console.log("Content received from server:", content);
             }
             setTimeout(() => {
                 isEditing.current = false;
