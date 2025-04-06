@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import config from '@/config';
 
 interface RankEntry {
   user_id: string;
@@ -18,10 +19,8 @@ const RanklistPage: React.FC = () => {
   useEffect(() => {
     const fetchRanklist = async () => {
       try {
-        if(ranklist.length >= 0){
-          console.log("Ranklist already fetched");
-        }
-        const response = await axios.get(`http://localhost:3000/contests/${id}/ranklist`);
+
+        const response = await axios.get(`${config.HOST}/contests/${id}/ranklist`);
         setRanklist(response.data.ranklist);
         console.log(response.data.ranklist);
       } catch (err) {
