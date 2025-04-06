@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import config from "@/config";
 
 interface FormData {
   language: string;
@@ -26,7 +27,7 @@ export const CodeSubmissionForm: React.FC = () => {
     setResponseMessage(null);
 
     try {
-      const response = await fetch("http://localhost:3000/api/test", {
+      const response = await fetch(`http://${config.HOST}/api/test`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import config from '@/config';
 
 export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +30,7 @@ export default function SignIn() {
       const email = formData.get('email') as string;
       const password = formData.get('password') as string;
 
-      const response = await fetch('http://localhost:3000/user/signin', {
+      const response = await fetch(`http://${config.HOST}/user/signin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

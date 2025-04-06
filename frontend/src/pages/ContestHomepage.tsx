@@ -1,7 +1,7 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import config from "@/config";
 
 // Define the types for a contest
 interface Contest {
@@ -41,7 +41,7 @@ const Contests: React.FC = () => {
   useEffect(() => {
     const fetchContests = async () => {
       try {
-        const response = await axios.get<Contest[]>("http://localhost:3000/contests");
+        const response = await axios.get<Contest[]>(`http://${config.HOST}/contests`);
         setContests(response.data);
       } catch (err) {
         console.error("Error fetching contests:", err);
@@ -67,7 +67,7 @@ const Contests: React.FC = () => {
     setSuccess("");
 
     try {
-      const response = await axios.post("http://localhost:3000/contests", formData);
+      const response = await axios.post(`http://${config.HOST}/contests`, formData);
       setSuccess("Contest added successfully!");
       setContests( response.data); // Add the new contest to the list
       setFormData({

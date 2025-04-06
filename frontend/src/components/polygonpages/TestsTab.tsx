@@ -3,6 +3,8 @@ import { fetchendpoint } from "@/services/polygon";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import config from "@/config";
+
 export const TestsTab: React.FC<{ apiKey: string, secret: string, problemId: string }> = ({apiKey, secret, problemId }) => {
     const [tests, setTests] = useState<any[]>([]);
     const [newTest, setNewTest] = useState({ testInput: '', testGroup: '', testDescription: '' });
@@ -35,7 +37,7 @@ export const TestsTab: React.FC<{ apiKey: string, secret: string, problemId: str
         setMessage(null);
 
         try {
-            const response = await fetch('http://localhost:3000/polygon/save-test', {
+            const response = await fetch(`http://${config.HOST}/polygon/save-test`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

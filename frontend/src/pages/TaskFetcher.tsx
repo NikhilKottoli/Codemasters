@@ -6,11 +6,7 @@ import ActionBar from './ActionBar';
 import QuestionCard from './QuestionCard';
 import { TaskResult, createTask } from '../types/Task';
 import { FullQuestionProps } from '@/types/question';
-
-
-
-
-
+import config from '@/config';
 
 const TaskFetcher: React.FC = () => {
   const { questionId, contestId } = useParams<{ questionId: string, contestId?: string }>();
@@ -24,6 +20,7 @@ const TaskFetcher: React.FC = () => {
   const [currentOutput, setCurrentOutput] = useState<string | null>(null);
   const userid = localStorage.getItem('token');
   const [submission, setSubmission] = useState(false);
+  const [action,setAction] = useState("run");
 
   // Fetch question details from the API using questionId
   const [question, setQuestion] = useState<FullQuestionProps | null>(null);
@@ -35,7 +32,7 @@ const TaskFetcher: React.FC = () => {
 
   useEffect(() => {
     if (questionId) {
-      axios.get(`http://localhost:3000/question/${questionId}`)
+      axios.get(`http://${config.HOST}/question/${questionId}`)
         .then(response => {
           for(let i =1;i<=response.data.visible_test_cases;i++){
             response.data.example_input[i] = "1\n" + response.data.example_input[i];
@@ -57,19 +54,20 @@ const TaskFetcher: React.FC = () => {
       let data;
   
       if (actionType === "submit") {
-        ({ data } = await axios.get(`http://localhost:3000/task/submit/${taskId}`));
+        ({ data } = await axios.get(`http://${config.HOST}/task/submit/${taskId}`));
       } else {
-        ({ data } = await axios.get(`http://localhost:3000/task/${taskId}`));
+        ({ data } = await axios.get(`http://${config.HOST}/task/${taskId}`));
       }
       
       console.log("Task result data:", data);
       if (data.status === "completed") {
-        if (data.output !== "Wrong Answer") setSubmission(true);
+        if (data.result !== "Wrong Answer") setSubmission(true);
+        if(action === "run") setSubmission(true);
         setResult(data.output || data.result);
         setIsPolling(false);
         setIsLoading(false);
       } else if (data.status === "failed") {
-        setError("Task processing failed");
+        setError("Task ing failed");
         setIsPolling(false);
         setIsLoading(false);
       } else {
@@ -107,7 +105,7 @@ const TaskFetcher: React.FC = () => {
       });
 
       await axios.post(
-        'http://localhost:3000/task',
+        `http://${config.HOST}/task`,
         {
           ...task,
           action: actionType,
@@ -172,16 +170,16 @@ const TaskFetcher: React.FC = () => {
               <div className="mt-4 p-4 bg-blue-100 border border-blue-500 rounded-lg shadow">
                 <p className="flex items-center">
                   <span className="animate-spin mr-2">⌛</span>
-                  Processing your code...
+                  ing your code...
                 </p>
               </div>
             )}
             {result && (
               <div
-                className={`mt-4 p-6 border rounded-lg shadow ${submission || (normalizeString(result) === normalizeString(currentOutput)) ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`}
+                className={`mt-4 p-6 border rounded-lg shadow bg-white border-gray-500 '}`}
               >
                 <h2
-                  className={`font-bold text-lg ${(submission || normalizeString(result) === normalizeString(currentOutput)) ? 'text-green-800' : 'text-red-800'} mb-2`}
+                  className={`font-bold text-lg ${(submission || normalizeString(result) === normalizeString(currentOutput)) ? 'text-green-800' : 'text-red-800'} mb-2 ${action == 'run' ? 'hidden' : ''}`}
                 >
                   {submission || (normalizeString(result) === normalizeString(currentOutput)) ? 'Correct' : 'Wrong'}
                 </h2>

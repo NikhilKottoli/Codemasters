@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import Editor from "@monaco-editor/react";
 import "./RealTimeEditor.css";
+import config from "@/config";
 
 export default function RealTimeCodeEditor() {
     const [socket, setSocket] = useState(null);
@@ -11,7 +12,7 @@ export default function RealTimeCodeEditor() {
 
     // Initialize socket connection
     useEffect(() => {
-        const s = io("http://localhost:8080");
+        const s = io(`http://${config.SOCKET_URL}`);
         setSocket(s);
 
         return () => {
@@ -56,7 +57,8 @@ export default function RealTimeCodeEditor() {
     return (
         <div className="code-editor-container">
             <Editor
-                height="500px"
+                height="1000px"
+                width={"1000px"}
                 defaultLanguage="javascript"
                 defaultValue="// Start coding here..."
                 theme="vs-dark"

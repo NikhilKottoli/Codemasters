@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios';
 import { Contest, DSAQuestion, MCQQuestion } from '@/types/contest';
+import config from '@/config';
 // import {Countdown} from '@/components/countdown';
 const ContestPage = () => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const ContestPage = () => {
   useEffect(() => {
     const fetchContest = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/contests/${id}`);
+        const response = await axios.get(`http://${config.HOST}/contests/${id}`);
         console.log(response);
         const contestData = response.data[0];
         setContest(contestData);
@@ -47,7 +48,7 @@ const ContestPage = () => {
         setIsLoading(true);
         
         // Fetch DSA questions
-        const dsaResponse = await axios.get('http://localhost:3000/question/');
+        const dsaResponse = await axios.get(`http://${config.HOST}/question/`);
         console.log("dsa questions fetch", dsaResponse.data);
         
         // Only filter if contest and contest.questions exist
@@ -56,7 +57,7 @@ const ContestPage = () => {
         }
         
         // Fetch MCQ questions
-        const mcqResponse = await axios.get('http://localhost:3000/question/mcqs');
+        const mcqResponse = await axios.get(`http://${config.HOST}/question/mcqs`);
         
         // Only filter if contest and contest.MCQ exist
         if (contest && contest.MCQ) {

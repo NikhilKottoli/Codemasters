@@ -5,7 +5,8 @@ import { Code2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
+import { toast } from 'sonner'
+import config from '@/config';
 
 export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
@@ -23,7 +24,7 @@ export default function SignUp() {
     };
 
     try {
-      const response = await fetch("http://localhost:3000/user/signup", {
+      const response = await fetch(`http://${config.HOST}/user/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
