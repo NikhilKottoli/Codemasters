@@ -105,7 +105,7 @@ const TaskFetcher: React.FC = () => {
       });
 
       await axios.post(
-        'http://${.config.HOST}/task',
+        `http://${config.HOST}/task`,
         {
           ...task,
           action: actionType,

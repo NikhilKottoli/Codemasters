@@ -1,6 +1,6 @@
 const Redis = require('ioredis');
 const axios = require('axios');
-
+const runtime_url = process.env.RUNTIME_URL || 'https://emkc.org/api/v2/piston/execute';
 class TaskProcessor {
   constructor(redisUrl = 'redis://localhost:6379') {
     this.redis = new Redis(redisUrl);
@@ -25,7 +25,7 @@ class TaskProcessor {
 
     
     try {
-      const response = await axios.post('https://emkc.org/api/v2/piston/execute', {
+      const response = await axios.post(`${runtime_url}`, {
       language: task.language,
       version: task.version || '*',
       files: [{

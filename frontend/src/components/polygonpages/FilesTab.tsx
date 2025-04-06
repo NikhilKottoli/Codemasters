@@ -2,6 +2,8 @@ import React,{useState,useEffect} from "react";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {fetchendpoint} from "@/services/polygon";
+import config from "@/config";
+
 export const FilesTab: React.FC<{ apiKey: string, secret: string, problemId: string }> = ({  apiKey, secret, problemId }) => {
     const [files, setFiles] = useState<{ sourceFiles?: any[], resourceFiles?: any[], auxFiles?: any[] }>({});
     const [fileType, setFileType] = useState('source');
@@ -62,7 +64,7 @@ export const FilesTab: React.FC<{ apiKey: string, secret: string, problemId: str
                 params.sourceType = sourceType;
             }
             
-            const response = await fetch('http://${.config.HOST}/polygon/save-file', {
+            const response = await fetch(`http://${config.HOST}/polygon/save-file`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(params)
@@ -89,7 +91,7 @@ export const FilesTab: React.FC<{ apiKey: string, secret: string, problemId: str
         setLoading(true);
         
         try {
-            const response = await fetch('http://${.config.HOST}/polygon/view-file', {
+            const response = await fetch(`http://${config.HOST}/polygon/view-file`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

@@ -1,6 +1,7 @@
 import React,{useState,useEffect} from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import config from "@/config";
 
 export default function CreateProblem() {
 
@@ -28,7 +29,7 @@ const [name, setName] = useState('');
         }, [])
     const handleCreateProblem = async () => {
         try {
-            const response = await fetch('http://${.config.HOST}/polygon/create-problem', {
+            const response = await fetch('http://${config.HOST}/polygon/create-problem', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
