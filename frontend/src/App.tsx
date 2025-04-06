@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route,Navigate } from 'react-router-dom';
 import SignIn from './pages/SignIn';
+import RanklistPage from './pages/RanklistPage';
 import SignUp from './pages/SignUp';
 import { Toaster } from '@/components/ui/sonner';
 import Questions from './pages/Questions';
@@ -24,6 +25,7 @@ function App() {
       <Navbar />
       <Router>
         <Routes>
+        <Route path = "/contest/:id/ranklist" element={<RanklistPage />} />
           <Route path="/contests" element={<Contests />} />
           <Route path="/contests/:id" element={<ContestDetailsPage />} />
           <Route path="/contestPage/:id" element={<ContestPage/>}/>
